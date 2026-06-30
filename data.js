@@ -2209,7 +2209,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Xenshen",
-      "model": "OLED",
+      "model": "Lite",
       "cpu": 1693,
       "gpu": 1710,
       "soc": 1731,
