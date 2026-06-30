@@ -20,6 +20,12 @@ PLATFORM_MAP = {"mariko": "mariko", "erista": "erista"}
 MARIKO_MODELS = {"OLED", "V2", "Lite"}
 ERISTA_MODELS = {"V1", "V1 Unpatched", "V1 Patched"}
 
+# Plausible speedo ranges per platform and field (inclusive).
+RANGES = {
+    "mariko": {"cpu": (1425, 1825), "gpu": (1425, 1825), "soc": (1425, 1825)},
+    "erista": {"cpu": (1825, 2200), "gpu": (1825, 2200), "soc": (1875, 2075)},
+}
+
 
 def parse_issue(body):
     """Issue forms render as '### Label\\n\\nvalue' blocks."""
@@ -37,11 +43,15 @@ def parse_issue(body):
     return sections
 
 
-def fail(msg):
+def set_output(key, value):
     out = os.environ.get("GITHUB_OUTPUT")
     if out:
         with open(out, "a", encoding="utf-8") as fh:
-            fh.write(f"error={msg}\n")
+            fh.write(f"{key}={value}\n")
+
+
+def fail(msg):
+    set_output("error", msg)
     print(f"ERROR: {msg}", file=sys.stderr)
     sys.exit(1)
 
@@ -73,9 +83,12 @@ def main():
     if not (cpu or gpu or soc):
         fail("At least one of CPU / GPU / SOC speedo must be a number.")
 
-    for name, val in (("CPU", cpu), ("GPU", gpu), ("SOC", soc)):
-        if val and not (800 <= int(val) <= 3000):
-            fail(f"{name} speedo {val} is outside the plausible range (800–3000).")
+    for field, val in (("cpu", cpu), ("gpu", gpu), ("soc", soc)):
+        if val:
+            lo, hi = RANGES[platform][field]
+            if not (lo <= int(val) <= hi):
+                fail(f"{field.upper()} speedo {val} is outside the valid "
+                     f"{platform.title()} range ({lo}–{hi}).")
 
     ram = get("RAM bin")
     if platform == "erista" and not ram:
@@ -90,6 +103,25 @@ def main():
         "notes": get("Notes").replace("\n", " ")[:240],
     }
 
+    # Reject exact duplicates already in the dataset (same owner/model/speedos/ram).
+    def key(r):
+        return (
+            r["platform"], (r.get("owner") or "").strip().lower(), r.get("model") or "",
+            r.get("cpu") or "", r.get("gpu") or "", r.get("soc") or "", (r.get("ram") or "").strip(),
+        )
+    # A duplicate is treated as a graceful no-op (not an error): the data is
+    # already present, so we just report it. This also makes the workflow safe
+    # against the same issue triggering twice (e.g. `opened` + `labeled`) — the
+    # second run finds the first run's row and quietly succeeds instead of
+    # posting a spurious failure.
+    if OUT.exists():
+        with OUT.open("r", encoding="utf-8-sig", newline="") as fh:
+            existing = {key(r) for r in csv.DictReader(fh)}
+        if key(row) in existing:
+            set_output("status", "duplicate")
+            print(f"Duplicate, skipping: {row}")
+            return
+
     new_file = not OUT.exists()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("a", encoding="utf-8", newline="") as fh:
@@ -98,6 +130,7 @@ def main():
             w.writeheader()
         w.writerow(row)
 
+    set_output("status", "added")
     print(f"Appended: {row}")
 
 

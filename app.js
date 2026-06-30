@@ -21,6 +21,13 @@
     { key: "soc", label: "SOC speedo", canvas: "socChart", color: "#4cc9f0" },
   ];
 
+  // Plausible speedo ranges per platform/field (inclusive). Kept in sync with
+  // tools/issue_to_csv.py, which is the authoritative server-side check.
+  const RANGES = {
+    mariko: { cpu: [1425, 1825], gpu: [1425, 1825], soc: [1425, 1825] },
+    erista: { cpu: [1825, 2200], gpu: [1825, 2200], soc: [1875, 2075] },
+  };
+
   const state = {
     platform: "mariko",
     consoleType: "Total",
@@ -262,6 +269,16 @@
   function openModal() { document.getElementById("modal").classList.remove("hidden"); }
   function closeModal() { document.getElementById("modal").classList.add("hidden"); }
 
+  // Identity of an entry, for duplicate detection. Numbers and form strings
+  // normalize the same way ("1680" === 1680, blank === null).
+  function entryKey(e) {
+    const n = v => (v === "" || v == null ? "" : String(Number(v)));
+    return [
+      (e.owner || "").trim().toLowerCase(), e.model || "",
+      n(e.cpu), n(e.gpu), n(e.soc), (e.ram || "").trim(),
+    ].join("|");
+  }
+
   function onSubmit(e) {
     e.preventDefault();
     const f = new FormData(e.target);
@@ -270,6 +287,21 @@
     const soc = (f.get("soc") || "").trim();
     if (!cpu && !gpu && !soc) {
       alert("Enter at least one speedo value (CPU, GPU or SOC).");
+      return;
+    }
+
+    const r = RANGES[state.platform];
+    for (const [field, val] of [["cpu", cpu], ["gpu", gpu], ["soc", soc]]) {
+      if (val && (Number(val) < r[field][0] || Number(val) > r[field][1])) {
+        alert(`${field.toUpperCase()} speedo ${val} is outside the valid ` +
+          `${PLATFORMS[state.platform].label} range (${r[field][0]}–${r[field][1]}).`);
+        return;
+      }
+    }
+
+    const candidate = { owner: f.get("owner"), model: f.get("model"), cpu, gpu, soc, ram: f.get("ram") };
+    if (platformEntries().some(x => entryKey(x) === entryKey(candidate)) &&
+        !confirm("An identical entry already exists in the database. Submit anyway?")) {
       return;
     }
     // GitHub issue-FORM dropdowns can't be prefilled via URL, so instead we open
@@ -295,6 +327,7 @@
     });
     window.open(`https://github.com/${getRepo()}/issues/new?${params.toString()}`,
       "_blank", "noopener");
+    e.target.reset();
     closeModal();
   }
 
