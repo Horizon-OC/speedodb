@@ -3,6 +3,11 @@ name: Add console submission
 on:
   issues:
     types: [opened, edited, labeled]
+  # A new comment on an open submission re-runs it (handy for retrying a fixed
+  # entry). Bot comments use GITHUB_TOKEN and don't trigger workflows, so this
+  # won't loop; closed issues are skipped by the `state == 'open'` guard below.
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
