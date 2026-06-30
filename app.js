@@ -272,19 +272,29 @@
       alert("Enter at least one speedo value (CPU, GPU or SOC).");
       return;
     }
-    // Pre-fill the GitHub issue form. Query keys must match the form field ids;
-    // dropdown values must match an option label.
+    // GitHub issue-FORM dropdowns can't be prefilled via URL, so instead we open
+    // a plain issue with the body pre-filled in the exact "### Heading\n\nvalue"
+    // shape the workflow parser reads. Everything lands populated.
+    const fields = [
+      ["Platform", PLATFORMS[state.platform].label],
+      ["Model", f.get("model") || ""],
+      ["Owner / handle", (f.get("owner") || "").trim()],
+      ["CPU speedo", cpu],
+      ["GPU speedo", gpu],
+      ["SOC speedo", soc],
+      ["RAM bin", f.get("ram") || ""],
+      ["Notes", (f.get("notes") || "").trim()],
+    ];
+    const body = fields
+      .map(([h, v]) => `### ${h}\n\n${v || "_No response_"}`)
+      .join("\n\n");
     const params = new URLSearchParams({
-      template: "add-console.yml",
-      platform: PLATFORMS[state.platform].label,
-      model: f.get("model") || "",
-      owner: (f.get("owner") || "").trim(),
-      cpu, gpu, soc,
-      ram: f.get("ram") || "",
-      notes: (f.get("notes") || "").trim(),
+      title: `[Submission] ${PLATFORMS[state.platform].label} ${f.get("model") || ""}`.trim(),
+      labels: "speedo-submission",
+      body,
     });
-    const url = `https://github.com/${getRepo()}/issues/new?${params.toString()}`;
-    window.open(url, "_blank", "noopener");
+    window.open(`https://github.com/${getRepo()}/issues/new?${params.toString()}`,
+      "_blank", "noopener");
     closeModal();
   }
 

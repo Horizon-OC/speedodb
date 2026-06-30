@@ -15,8 +15,13 @@ concurrency:
 
 jobs:
   add-entry:
-    # Only act on issues created from the submission template.
-    if: contains(join(github.event.issue.labels.*.name, ','), 'speedo-submission')
+    # Act on OPEN submission issues. Gate on the body marker rather than a label
+    # (labels aren't reliably present at creation). Requiring the issue to be open
+    # means a processed submission (which we close) is never re-added on later edits.
+    if: >-
+      github.event.issue.state == 'open' &&
+      contains(github.event.issue.body, '### Platform') &&
+      contains(github.event.issue.body, '### Model')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,9 +68,11 @@ jobs:
       - name: Comment validation error
         if: failure()
         uses: actions/github-script@v7
+        env:
+          PARSE_ERROR: ${{ steps.parse.outputs.error }}
         with:
           script: |
-            const err = `${{ steps.parse.outputs.error }}` || "The submission could not be processed.";
+            const err = process.env.PARSE_ERROR || "The submission could not be processed.";
             await github.rest.issues.createComment({
               owner: context.repo.owner, repo: context.repo.repo,
               issue_number: context.issue.number,

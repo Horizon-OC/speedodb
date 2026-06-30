@@ -17,7 +17,7 @@ The site is fully static — no server. The dataset lives in
 (`window.SPEEDO_DATA`), which the page loads via a plain `<script>` tag (works on
 Pages and from `file://`).
 
-```
+```text
 data/entries.csv  ──(tools/build_data.py)──▶  data.js  ──▶  index.html + app.js
 ```
 
@@ -50,9 +50,13 @@ python tools/import_sources.py "Mariko export.csv" "Erista export.csv"
 
 ## Deploying
 
-Settings → **Pages** → deploy from branch `main`, root (`/`). The `.nojekyll`
-file keeps Pages from running Jekyll. The repo for issue links is auto-detected
-from the Pages URL; override `REPO_FALLBACK` in `app.js` if needed.
+Settings → **Pages** → **Source: GitHub Actions**. The
+[`deploy-pages`](.github/workflows/deploy-pages.yml) workflow then publishes the
+site on every push to `main`, and **redeploys automatically after each accepted
+submission** (triggered via `workflow_run` once the submission workflow commits,
+since the bot's `GITHUB_TOKEN` push doesn't fire `push` workflows itself). The
+`.nojekyll` file keeps Pages from running Jekyll. The repo for issue links is
+auto-detected from the Pages URL; override `REPO_FALLBACK` in `app.js` if needed.
 
 ## Notes
 
