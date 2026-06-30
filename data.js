@@ -2289,15 +2289,6 @@ window.SPEEDO_DATA = {
       "notes": ""
     },
     {
-      "owner": "JAVELIN",
-      "model": "OLED",
-      "cpu": 1725,
-      "gpu": 1732,
-      "soc": 1745,
-      "ram": "AA-MGCL",
-      "notes": ""
-    },
-    {
       "owner": "Shafin",
       "model": "OLED",
       "cpu": 1608,
