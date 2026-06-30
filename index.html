@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horizon OC - SpeedoDB</title>
+  <meta name="description" content="A community database of Nintendo Switch CPU/GPU/SOC speedos and RAM bins." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>⚡</text></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <a class="hoc-logo" href="https://horizon-oc.github.io" title="Horizon-OC">
+        <img src="https://horizon-oc.github.io/logo.svg" alt="Horizon-OC" />
+      </a>
+      <div>
+        <h1>SpeedoDB</h1>
+        <p class="tagline">Switch speedo, IDDQ &amp; RAM bin database</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <input id="search" type="search" placeholder="Search owner, RAM bin, notes…" autocomplete="off" />
+      <button id="addBtn" class="btn primary">+ Add entry</button>
+    </div>
+  </header>
+
+  <div class="platform-switch" role="tablist" aria-label="Platform">
+    <button class="platform-btn" data-platform="mariko" role="tab">
+      <span class="pf-name">Mariko</span>
+      <span class="pf-sub">V2 · Lite · OLED</span>
+    </button>
+    <button class="platform-btn" data-platform="erista" role="tab">
+      <span class="pf-name">Erista</span>
+      <span class="pf-sub">V1</span>
+    </button>
+  </div>
+
+  <nav id="tabs" class="tabs" aria-label="Console type filter"></nav>
+
+  <main>
+    <section class="stats" id="stats" aria-label="Averages"></section>
+
+    <section class="charts">
+      <div class="card chart-card">
+        <h2>CPU speedo distribution</h2>
+        <div class="chart-wrap"><canvas id="cpuChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h2>GPU speedo distribution</h2>
+        <div class="chart-wrap"><canvas id="gpuChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h2>SOC speedo distribution</h2>
+        <div class="chart-wrap"><canvas id="socChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h2>RAM bin distribution</h2>
+        <div class="chart-wrap"><canvas id="ramChart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="table-head">
+        <h2 id="tableTitle">Entries</h2>
+        <span id="rowCount" class="muted"></span>
+      </div>
+      <div class="table-scroll">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th data-key="owner">Owner</th>
+              <th data-key="model">Model</th>
+              <th data-key="cpu" class="num">CPU</th>
+              <th data-key="gpu" class="num">GPU</th>
+              <th data-key="soc" class="num">SOC</th>
+              <th data-key="ram">RAM bin</th>
+              <th data-key="notes">Notes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <a class="back-btn" href="https://horizon-oc.github.io" title="Back to Horizon-OC">← Horizon-OC</a>
+
+  <footer class="site-footer">
+    <p>SpeedoDB · static site hosted on GitHub Pages · <span id="srcCount"></span> entries in dataset.
+       Submissions are added via GitHub issues.</p>
+  </footer>
+
+  <!-- Add entry modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <h2 id="modalTitle">Add a console</h2>
+      <form id="addForm">
+        <label>Owner / handle <input name="owner" required maxlength="40" /></label>
+        <label>Model
+          <select name="model" id="modelSelect" required></select>
+        </label>
+        <div class="grid3">
+          <label>CPU speedo <input name="cpu" type="number" inputmode="numeric" /></label>
+          <label>GPU speedo <input name="gpu" type="number" inputmode="numeric" /></label>
+          <label>SOC speedo <input name="soc" type="number" inputmode="numeric" /></label>
+        </div>
+        <label>RAM bin <select name="ram" id="ramSelect"></select></label>
+        <label>Notes <textarea name="notes" rows="2" maxlength="240"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" id="cancelBtn" class="btn">Cancel</button>
+          <button type="submit" class="btn primary">Submit on GitHub →</button>
+        </div>
+        <p class="muted small">This opens a pre-filled GitHub issue. When you submit it, a bot
+           validates the entry and adds it to the shared database automatically — just a normal issue.</p>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

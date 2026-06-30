@@ -1,0 +1,73 @@
+name: Add console submission
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+# Avoid two submissions racing to push at once.
+concurrency:
+  group: speedodb-data
+  cancel-in-progress: false
+
+jobs:
+  add-entry:
+    # Only act on issues created from the submission template.
+    if: contains(join(github.event.issue.labels.*.name, ','), 'speedo-submission')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Parse submission and append to data
+        id: parse
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          python tools/issue_to_csv.py
+          python tools/build_data.py
+
+      - name: Commit dataset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/entries.csv data.js
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+            exit 0
+          fi
+          git commit -m "data: add submission from #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment success and close
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "✅ Added to SpeedoDB — thanks! It will appear on the site after the next Pages deploy."
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, state: "closed"
+            });
+
+      - name: Comment validation error
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const err = `${{ steps.parse.outputs.error }}` || "The submission could not be processed.";
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `⚠️ Could not add this submission:\n\n> ${err}\n\nEdit the issue to fix it and it will be retried automatically.`
+            });

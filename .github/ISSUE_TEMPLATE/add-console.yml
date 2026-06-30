@@ -1,0 +1,75 @@
+name: Add a console to SpeedoDB
+description: Submit a Switch unit's speedo / RAM data. A bot adds it to the database automatically.
+title: "[Submission] new console"
+labels: ["speedo-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing! Fill in what you know — at least one speedo value is required.
+        Once you submit, an automated workflow validates it and adds it to the database.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Mariko
+        - Erista
+    validations:
+      required: true
+  - type: dropdown
+    id: model
+    attributes:
+      label: Model
+      description: "Mariko: OLED / V2 / Lite — Erista: V1 (pick Unpatched/Patched if you know)."
+      options:
+        - OLED
+        - V2
+        - Lite
+        - V1
+        - V1 Unpatched
+        - V1 Patched
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner / handle
+      placeholder: your name or handle
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU speedo
+      placeholder: e.g. 1680
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU speedo
+      placeholder: e.g. 1695
+  - type: input
+    id: soc
+    attributes:
+      label: SOC speedo
+      placeholder: e.g. 1710
+  - type: dropdown
+    id: ram
+    attributes:
+      label: RAM bin
+      description: "Mariko bins: AA-MGCL / AB-MGCL / AM-MGCJ / NEE / NME / WT:B / WT:E / WT:F — Erista bins: MGCH / NLE / WT:C."
+      options:
+        - AA-MGCL
+        - AB-MGCL
+        - AM-MGCJ
+        - NEE
+        - NME
+        - WT:B
+        - WT:E
+        - WT:F
+        - MGCH
+        - NLE
+        - WT:C
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      placeholder: anything notable about this unit
