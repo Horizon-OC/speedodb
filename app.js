@@ -27,7 +27,7 @@
   // tools/resolve_submissions.py, which is the authoritative server-side check.
   const RANGES = {
     mariko: { cpu: [1425, 1825], gpu: [1425, 1825], soc: [1425, 1825] },
-    erista: { cpu: [1825, 2200], gpu: [1825, 2200], soc: [1875, 2075] },
+    erista: { cpu: [1825, 2200], gpu: [1825, 2200], soc: [1825, 2075] },
   };
 
   const state = {
