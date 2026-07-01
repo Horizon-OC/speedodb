@@ -8,7 +8,7 @@ on:
   # which does NOT trigger `push` workflows, so we redeploy via workflow_run
   # once the submission workflow finishes.
   workflow_run:
-    workflows: ["Add console submission"]
+    workflows: ["Resolve submissions"]
     types: [completed]
   workflow_dispatch:
 

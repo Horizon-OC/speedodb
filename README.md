@@ -23,16 +23,25 @@ data/entries.csv  ──(tools/build_data.py)──▶  data.js  ──▶  inde
 
 ### Adding entries (for everyone)
 
-The **+ Add entry** button opens a pre-filled
-[GitHub issue form](.github/ISSUE_TEMPLATE/add-console.yml). When the issue is
-submitted, the [`add-entry`](.github/workflows/add-entry.yml) workflow:
+The **+ Add entry** button opens a pre-filled submission issue (matching the
+[issue form](.github/ISSUE_TEMPLATE/add-console.yml)). The
+[`resolve-submissions`](.github/workflows/resolve-submissions.yml) workflow then,
+on any issue event (plus a 3-hourly safety sweep and manual dispatch),
+processes **every open submission in a single run**:
 
-1. parses and validates the submission (`tools/issue_to_csv.py`),
-2. appends a row to `data/entries.csv`,
-3. regenerates `data.js` (`tools/build_data.py`),
-4. commits the change and closes the issue (or comments back if invalid).
+1. lists all open submission issues via the API (`tools/resolve_submissions.py`),
+2. validates each and appends the valid, unique ones to `data/entries.csv`,
+3. regenerates `data.js` (`tools/build_data.py`) and pushes once,
+4. labels, comments on, and closes each issue (leaving invalid ones open with an
+   explanation).
 
-After the commit, the Pages deploy publishes the new data automatically.
+Handling the whole backlog per run — rather than one run per issue — means many
+submissions arriving at once never race to push. The workflow also applies the
+`speedo-submission` label itself, since submitters usually can't set labels.
+After the push, the Pages deploy publishes the new data automatically.
+
+To clear a backlog immediately, run the workflow manually: Actions →
+**Resolve submissions** → *Run workflow*.
 
 ## Local development
 

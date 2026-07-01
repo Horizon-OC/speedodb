@@ -1,0 +1,102 @@
+name: Resolve submissions
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"   # safety net: sweep the backlog every 3 hours
+
+permissions:
+  contents: write
+  issues: write
+
+# One resolver at a time. Every trigger processes the WHOLE open backlog in a
+# single run, so many issues / events never race to push — later triggers just
+# find nothing left to do.
+concurrency:
+  group: speedodb-data
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    # Manual/scheduled runs always sweep. Issue/comment events only bother when
+    # it's an open submission (the run then handles every open submission anyway).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event.issue.state == 'open' &&
+       contains(github.event.issue.body, '### Platform') &&
+       contains(github.event.issue.body, '### Model'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Resolve all open submissions and push
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          pushed=""
+          for attempt in 1 2 3 4 5; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+            python tools/resolve_submissions.py
+            python tools/build_data.py
+            git add data/entries.csv data.js
+            if git diff --cached --quiet; then
+              echo "No data changes this run."
+              pushed="nochange"; break
+            fi
+            git commit --quiet -m "data: resolve submissions [skip ci]"
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt $attempt."
+              pushed="ok"; break
+            fi
+            echo "Push rejected (attempt $attempt) — re-syncing and retrying…"
+            sleep $(( (RANDOM % 4) + 2 ))
+          done
+          if [ -z "$pushed" ]; then
+            echo "::error::Could not push after retries."; exit 1
+          fi
+
+      - name: Comment, label and close
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('results.json')) return;
+            const results = JSON.parse(fs.readFileSync('results.json', 'utf8'));
+            const { owner, repo } = context.repo;
+            for (const r of results) {
+              try {
+                // Apply the label ourselves — submitters often lack permission to.
+                if (!(r.labels || []).includes('speedo-submission')) {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: r.number,
+                    labels: ['speedo-submission'] }).catch(() => {});
+                }
+                if (r.status === 'error') {
+                  // Only notify once: skip if we've already flagged it needs-fix.
+                  if ((r.labels || []).includes('needs-fix')) continue;
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: r.number,
+                    labels: ['needs-fix'] }).catch(() => {});
+                  await github.rest.issues.createComment({ owner, repo, issue_number: r.number,
+                    body: `⚠️ Could not add this submission:\n\n> ${r.message}\n\nEdit the issue to fix it; it will be retried automatically.` });
+                } else {
+                  const body = r.status === 'duplicate'
+                    ? "ℹ️ This console is already in SpeedoDB — nothing to add. Thanks anyway!"
+                    : "✅ Added to SpeedoDB — thanks! It will appear on the site after the next Pages deploy.";
+                  await github.rest.issues.createComment({ owner, repo, issue_number: r.number, body });
+                  await github.rest.issues.update({ owner, repo, issue_number: r.number, state: 'closed' });
+                }
+              } catch (e) {
+                core.warning(`Issue #${r.number}: ${e.message}`);
+              }
+            }
