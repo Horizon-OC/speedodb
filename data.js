@@ -2805,7 +2805,7 @@ window.SPEEDO_DATA = {
   "erista": [
     {
       "owner": "Lightos_",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2130,
       "gpu": 2132,
       "soc": 1991,
@@ -2814,7 +2814,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Souldbminer",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2130,
       "gpu": 2128,
       "soc": 2025,
@@ -2823,7 +2823,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Adam",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2055,
       "gpu": 2058,
       "soc": 1956,
@@ -2832,7 +2832,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "WinnerBoi77",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2057,
       "gpu": 2071,
       "soc": 1963,
@@ -2841,7 +2841,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "nanofix?",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2108,
       "gpu": 2118,
       "soc": 1992,
@@ -2850,7 +2850,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "zyqifana",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2103,
       "gpu": 2099,
       "soc": 2009,
@@ -2859,7 +2859,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "jelbo",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2025,
       "gpu": 2018,
       "soc": 1930,
@@ -2868,7 +2868,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Samy",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2116,
       "gpu": 2114,
       "soc": 2002,
@@ -2877,7 +2877,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Samy",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2030,
       "gpu": 2021,
       "soc": 1942,
@@ -2886,7 +2886,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Samy",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2074,
       "gpu": 2058,
       "soc": 1952,
@@ -2895,7 +2895,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Samy",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2052,
       "gpu": 2055,
       "soc": 1933,
@@ -2904,7 +2904,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Manin",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2024,
       "gpu": 2033,
       "soc": 1967,
@@ -2913,7 +2913,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Kwadarth",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2103,
       "gpu": 2118,
       "soc": 2010,
@@ -2922,7 +2922,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Heri",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2101,
       "gpu": 2101,
       "soc": 2000,
@@ -2931,7 +2931,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "AnxietyTimmy",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2016,
       "gpu": 2006,
       "soc": 1908,
@@ -2940,7 +2940,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "Chansey",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2133,
       "gpu": 2147,
       "soc": 2019,
@@ -2949,7 +2949,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "evil_santa",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2058,
       "gpu": 2068,
       "soc": 1956,
@@ -2967,7 +2967,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "supergamedude",
-      "model": "V1",
+      "model": "V1 Unpatched",
       "cpu": 2050,
       "gpu": 2043,
       "soc": 1947,
@@ -2976,7 +2976,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "nanofix",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2005,
       "gpu": 1997,
       "soc": 1937,
@@ -2985,7 +2985,7 @@ window.SPEEDO_DATA = {
     },
     {
       "owner": "nanofix",
-      "model": "V1",
+      "model": "V1 Patched",
       "cpu": 2087,
       "gpu": 2076,
       "soc": 1977,
