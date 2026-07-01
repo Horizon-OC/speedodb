@@ -36,25 +36,37 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Parse submission and append to data
+      - name: Parse, append and push (race-proof)
         id: parse
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          python tools/issue_to_csv.py
-          python tools/build_data.py
-
-      - name: Commit dataset
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/entries.csv data.js
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-            exit 0
-          fi
-          git commit -m "data: add submission from #${{ github.event.issue.number }}"
-          git push
+          # Re-sync to the latest main and re-apply the append on every attempt,
+          # so a concurrent commit landing between checkout and push just makes us
+          # retry against fresh data instead of failing with a non-fast-forward.
+          for attempt in 1 2 3 4 5; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+            # Validation errors exit non-zero -> fail the step (error comment).
+            python tools/issue_to_csv.py || exit 1
+            python tools/build_data.py
+            git add data/entries.csv data.js
+            if git diff --cached --quiet; then
+              echo "No data changes (duplicate / no-op)."
+              exit 0
+            fi
+            git commit --quiet -m "data: add submission from #${{ github.event.issue.number }}"
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt) — re-syncing and retrying…"
+            sleep $(( (RANDOM % 4) + 2 ))
+          done
+          echo "::error::Could not push after 5 attempts."
+          exit 1
 
       - name: Comment success and close
         if: success()
