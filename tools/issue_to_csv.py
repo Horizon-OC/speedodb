@@ -18,7 +18,7 @@ FIELDS = ["platform", "owner", "model", "cpu", "gpu", "soc", "ram", "notes"]
 
 PLATFORM_MAP = {"mariko": "mariko", "erista": "erista"}
 MARIKO_MODELS = {"OLED", "V2", "Lite"}
-ERISTA_MODELS = {"V1", "V1 Unpatched", "V1 Patched"}
+ERISTA_MODELS = {"V1 Unpatched", "V1 Patched"}
 
 # Plausible speedo ranges per platform and field (inclusive).
 RANGES = {

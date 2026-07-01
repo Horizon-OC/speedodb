@@ -7,7 +7,7 @@
   const PLATFORMS = {
     mariko: { label: "Mariko", order: ["OLED", "V2", "Lite"],
       ram: ["AA-MGCL", "AB-MGCL", "AM-MGCJ", "NEE", "NME", "WT:B", "WT:E", "WT:F"] },
-    erista: { label: "Erista", order: ["V1", "V1 Unpatched", "V1 Patched"],
+    erista: { label: "Erista", order: ["V1 Unpatched", "V1 Patched"],
       ram: ["HB-MGCH", "NLE", "WT:C"] },
   };
 
@@ -249,14 +249,13 @@
     SPEEDOS.forEach(def => renderSpeedoChart(def, rows));
     renderRamChart(rows);
     renderTable(rows);
-    refreshModalOptions(entries);
+    refreshModalOptions();
   }
 
   /* ---------- add-entry modal → GitHub issue ---------- */
 
-  function refreshModalOptions(entries) {
-    const models = [...new Set([...PLATFORMS[state.platform].order,
-      ...entries.map(e => e.model).filter(Boolean)])];
+  function refreshModalOptions() {
+    const models = PLATFORMS[state.platform].order;
     document.getElementById("modelSelect").innerHTML =
       models.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("");
 

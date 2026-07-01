@@ -21,12 +21,11 @@ body:
     id: model
     attributes:
       label: Model
-      description: "Mariko: OLED / V2 / Lite — Erista: V1 (pick Unpatched/Patched if you know)."
+      description: "Mariko: OLED / V2 / Lite — Erista: V1 Unpatched / V1 Patched."
       options:
         - OLED
         - V2
         - Lite
-        - V1
         - V1 Unpatched
         - V1 Patched
     validations:
