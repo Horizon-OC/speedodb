@@ -244,20 +244,20 @@ mariko,N/a,Lite,1461,1482,1502,WT:F,
 mariko,N/a,V2,1466,1487,1492,NME,"Worst Switch Ever, barely passes QC"
 mariko,yousef,OLED,1619,1642,1677,AA-MGCL,
 mariko,yousef,OLED,1613,1618,1634,AA-MGCL,
-erista,Lightos_,V1,2130,2132,1991,MGCH,God tier ram
-erista,Souldbminer,V1,2130,2128,2025,MGCH,Very good bin but a bit funky at high voltages
-erista,Adam,V1,2055,2058,1956,MGCH,
-erista,WinnerBoi77,V1,2057,2071,1963,MGCH,RIP charging port
-erista,nanofix?,V1,2108,2118,1992,MGCH,
-erista,zyqifana,V1,2103,2099,2009,MGCH,
-erista,jelbo,V1,2025,2018,1930,MGCH,
-erista,Samy,V1,2116,2114,2002,MGCH,
-erista,Samy,V1,2030,2021,1942,MGCH,Best MGCH bin ever (2227 at 1175mv)
-erista,Samy,V1,2074,2058,1952,MGCH,
-erista,Samy,V1,2052,2055,1933,MGCH,
-erista,Manin,V1,2024,2033,1967,MGCH,"Worst ram binning of all time, 2131@???mV (still needs further testing)"
+erista,Lightos_,V1,2130,2132,1991,HB-MGCH,God tier ram
+erista,Souldbminer,V1,2130,2128,2025,HB-MGCH,Very good bin but a bit funky at high voltages
+erista,Adam,V1,2055,2058,1956,HB-MGCH,
+erista,WinnerBoi77,V1,2057,2071,1963,HB-MGCH,RIP charging port
+erista,nanofix?,V1,2108,2118,1992,HB-MGCH,
+erista,zyqifana,V1,2103,2099,2009,HB-MGCH,
+erista,jelbo,V1,2025,2018,1930,HB-MGCH,
+erista,Samy,V1,2116,2114,2002,HB-MGCH,
+erista,Samy,V1,2030,2021,1942,HB-MGCH,Best MGCH bin ever (2227 at 1175mv)
+erista,Samy,V1,2074,2058,1952,HB-MGCH,
+erista,Samy,V1,2052,2055,1933,HB-MGCH,
+erista,Manin,V1,2024,2033,1967,HB-MGCH,"Worst ram binning of all time, 2131@???mV (still needs further testing)"
 erista,Kwadarth,V1,2103,2118,2010,NLE,
-erista,Heri,V1,2101,2101,,NLE,Weird speedo
+erista,Heri,V1,2101,2101,2000,NLE,Weird speedo
 erista,AnxietyTimmy,V1,2016,2006,1908,NLE,
 erista,Chansey,V1,2133,2147,2019,NLE,
 erista,evil_santa,V1,2058,2068,1956,WT:C,Only known WT:C
@@ -276,7 +276,7 @@ mariko,tpoison,V2,1697,1720,1739,AA-MGCL,
 mariko,ranzuha,OLED,1617,1632,1668,NEE,
 mariko,j w,OLED,1581,1605,1643,AA-MGCL,
 mariko,Saint,Lite,1721,1722,1740,AM-MGCJ,
-erista,Dwun,V1 Unpatched,2014,2017,1925,MGCH,
+erista,Dwun,V1 Unpatched,2014,2017,1925,HB-MGCH,
 mariko,seaice,Lite,1742,1756,1764,AM-MGCJ,
 mariko,Custom Computing,V2,1608,1622,1642,WT:E,Speedo is likely fake
 mariko,Udhav23,OLED,1642,1655,1664,AA-MGCL,
@@ -285,7 +285,7 @@ mariko,letum00,Lite,1634,1670,1682,AA-MGCL,
 mariko,Random Task,OLED,1559,1588,1599,AA-MGCL,
 mariko,JSE,OLED,1684,1705,1726,NEE,
 mariko,Nix.Lon,V2,1643,1646,1662,AA-MGCL,
-erista,supergamedude,V1,2050,2043,1947,MGCH,
+erista,supergamedude,V1,2050,2043,1947,HB-MGCH,
 mariko,letum00,Lite,1620,1628,1633,AM-MGCJ,
 mariko,nanofix,OLED,1556,1591,1607,AA-MGCL,
 mariko,nanofix,OLED,1641,1664,1683,AB-MGCL,
@@ -296,7 +296,7 @@ erista,nanofix,V1,2005,1997,1937,HB-MGCH,
 mariko,nanofix,OLED,1614,1643,1659,AA-MGCL,
 mariko,nanofix,Lite,1596,1596,1629,NEE,
 mariko,nanofix,V2,1687,1710,1741,NME,
-mariko,nanofix,OLED,1631,1651,1675,,
+mariko,nanofix,OLED,1631,1651,1675,AA-MGCL,
 mariko,nanofix,OLED,1629,1629,1647,AA-MGCL,
 mariko,nanofix,OLED,1683,1698,1713,WT:F,
 mariko,nanofix,OLED,1581,1586,1610,AB-MGCL,
@@ -314,7 +314,7 @@ mariko,nanofix,OLED,1658,1693,1714,AB-MGCL,
 mariko,nanofix,Lite,1715,1735,1749,AA-MGCL,
 mariko,nanofix,Lite,1657,1676,1703,NEE,
 mariko,nanofix,OLED,1609,1630,1647,NEE,
-erista,nanofix,V1,2087,2076,1977,MGCH,
+erista,nanofix,V1,2087,2076,1977,HB-MGCH,
 mariko,nanofix,OLED,1553,1589,1609,AA-MGCL,
 mariko,nanofix,Lite,1642,1647,1678,NEE,
 mariko,nanofix,Lite,1672,1702,1715,NME,

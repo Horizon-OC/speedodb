@@ -55,7 +55,7 @@ body:
     id: ram
     attributes:
       label: RAM bin
-      description: "Mariko bins: AA-MGCL / AB-MGCL / AM-MGCJ / NEE / NME / WT:B / WT:E / WT:F — Erista bins: MGCH / NLE / WT:C."
+      description: "Mariko bins: AA-MGCL / AB-MGCL / AM-MGCJ / NEE / NME / WT:B / WT:E / WT:F — Erista bins: HB-MGCH / NLE / WT:C."
       options:
         - AA-MGCL
         - AB-MGCL
@@ -65,7 +65,7 @@ body:
         - WT:B
         - WT:E
         - WT:F
-        - MGCH
+        - HB-MGCH
         - NLE
         - WT:C
   - type: textarea

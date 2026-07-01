@@ -8,7 +8,7 @@
     mariko: { label: "Mariko", order: ["OLED", "V2", "Lite"],
       ram: ["AA-MGCL", "AB-MGCL", "AM-MGCJ", "NEE", "NME", "WT:B", "WT:E", "WT:F"] },
     erista: { label: "Erista", order: ["V1", "V1 Unpatched", "V1 Patched"],
-      ram: ["MGCH", "NLE", "WT:C"] },
+      ram: ["HB-MGCH", "NLE", "WT:C"] },
   };
 
   // Repo used for issue-submission links. Auto-detected on GitHub Pages, with

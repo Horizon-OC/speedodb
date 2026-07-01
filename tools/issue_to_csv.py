@@ -92,7 +92,7 @@ def main():
 
     ram = get("RAM bin")
     if platform == "erista" and not ram:
-        ram = "MGCH"
+        ram = "HB-MGCH"
 
     row = {
         "platform": platform,

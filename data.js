@@ -2809,7 +2809,7 @@ window.SPEEDO_DATA = {
       "cpu": 2130,
       "gpu": 2132,
       "soc": 1991,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": "God tier ram"
     },
     {
@@ -2818,7 +2818,7 @@ window.SPEEDO_DATA = {
       "cpu": 2130,
       "gpu": 2128,
       "soc": 2025,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": "Very good bin but a bit funky at high voltages"
     },
     {
@@ -2827,7 +2827,7 @@ window.SPEEDO_DATA = {
       "cpu": 2055,
       "gpu": 2058,
       "soc": 1956,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2836,7 +2836,7 @@ window.SPEEDO_DATA = {
       "cpu": 2057,
       "gpu": 2071,
       "soc": 1963,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": "RIP charging port"
     },
     {
@@ -2845,7 +2845,7 @@ window.SPEEDO_DATA = {
       "cpu": 2108,
       "gpu": 2118,
       "soc": 1992,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2854,7 +2854,7 @@ window.SPEEDO_DATA = {
       "cpu": 2103,
       "gpu": 2099,
       "soc": 2009,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2863,7 +2863,7 @@ window.SPEEDO_DATA = {
       "cpu": 2025,
       "gpu": 2018,
       "soc": 1930,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2872,7 +2872,7 @@ window.SPEEDO_DATA = {
       "cpu": 2116,
       "gpu": 2114,
       "soc": 2002,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2881,7 +2881,7 @@ window.SPEEDO_DATA = {
       "cpu": 2030,
       "gpu": 2021,
       "soc": 1942,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": "Best MGCH bin ever (2227 at 1175mv)"
     },
     {
@@ -2890,7 +2890,7 @@ window.SPEEDO_DATA = {
       "cpu": 2074,
       "gpu": 2058,
       "soc": 1952,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2899,7 +2899,7 @@ window.SPEEDO_DATA = {
       "cpu": 2052,
       "gpu": 2055,
       "soc": 1933,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2908,7 +2908,7 @@ window.SPEEDO_DATA = {
       "cpu": 2024,
       "gpu": 2033,
       "soc": 1967,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": "Worst ram binning of all time, 2131@???mV (still needs further testing)"
     },
     {
@@ -2925,7 +2925,7 @@ window.SPEEDO_DATA = {
       "model": "V1",
       "cpu": 2101,
       "gpu": 2101,
-      "soc": null,
+      "soc": 2000,
       "ram": "NLE",
       "notes": "Weird speedo"
     },
@@ -2962,7 +2962,7 @@ window.SPEEDO_DATA = {
       "cpu": 2014,
       "gpu": 2017,
       "soc": 1925,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2971,7 +2971,7 @@ window.SPEEDO_DATA = {
       "cpu": 2050,
       "gpu": 2043,
       "soc": 1947,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     },
     {
@@ -2989,7 +2989,7 @@ window.SPEEDO_DATA = {
       "cpu": 2087,
       "gpu": 2076,
       "soc": 1977,
-      "ram": "MGCH",
+      "ram": "HB-MGCH",
       "notes": ""
     }
   ]

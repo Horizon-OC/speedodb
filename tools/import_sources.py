@@ -76,7 +76,7 @@ def main():
                 "platform": "erista", "owner": raw[0].strip(),
                 "model": "V1",  # Erista; patch status isn't in the source data
                 "cpu": cpu, "gpu": gpu, "soc": soc,
-                "ram": ram or "MGCH",  # blank means MGCH per the source sheet
+                "ram": ram or "HB-MGCH",  # blank Erista RAM defaults to HB-MGCH
                 "notes": (raw[5].strip() if len(raw) > 5 else ""),
             })
 
