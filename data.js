@@ -2501,7 +2501,7 @@ window.SPEEDO_DATA = {
       "cpu": 1631,
       "gpu": 1651,
       "soc": 1675,
-      "ram": "",
+      "ram": "AA-MGCL",
       "notes": ""
     },
     {
