@@ -5,9 +5,11 @@
   "use strict";
 
   const PLATFORMS = {
-    mariko: { label: "Mariko", order: ["OLED", "V2", "Lite"],
+    // sort: default table sort key for the platform. Erista defaults to GPU
+    // speedo, which is the more reliable metric on those units; Mariko uses SOC.
+    mariko: { label: "Mariko", order: ["OLED", "V2", "Lite"], sort: "soc",
       ram: ["AA-MGCL", "AB-MGCL", "AM-MGCJ", "NEE", "NME", "WT:B", "WT:E", "WT:F"] },
-    erista: { label: "Erista", order: ["V1 Unpatched", "V1 Patched"],
+    erista: { label: "Erista", order: ["V1 Unpatched", "V1 Patched"], sort: "gpu",
       ram: ["HB-MGCH", "NLE", "WT:C"] },
   };
 
@@ -340,6 +342,8 @@
       btn.onclick = () => {
         state.platform = btn.dataset.platform;
         state.consoleType = "Total";
+        state.sortKey = PLATFORMS[state.platform].sort;  // platform's default metric
+        state.sortDir = -1;
         render();
       };
     });

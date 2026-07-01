@@ -18,9 +18,12 @@ permissions:
   id-token: write
 
 # Allow one concurrent deployment; don't cancel an in-progress one.
+# Let a newer deploy supersede an in-flight/queued one. With `false`, two deploys
+# firing close together (issue event + workflow_run + sweep) collide at the Pages
+# API ("in progress deployment"). We always want the latest data live anyway.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
