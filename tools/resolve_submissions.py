@@ -33,7 +33,7 @@ MARIKO_MODELS = {"OLED", "V2", "Lite"}
 ERISTA_MODELS = {"V1 Unpatched", "V1 Patched"}
 RANGES = {
     "mariko": {"cpu": (1425, 1825), "gpu": (1425, 1825), "soc": (1425, 1825)},
-    "erista": {"cpu": (1825, 2200), "gpu": (1825, 2200), "soc": (1875, 2075)},
+    "erista": {"cpu": (1825, 2200), "gpu": (1825, 2200), "soc": (1825, 2075)},
 }
 
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
