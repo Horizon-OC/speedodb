@@ -94,7 +94,8 @@ jobs:
                     ? "ℹ️ This console is already in SpeedoDB — nothing to add. Thanks anyway!"
                     : "✅ Added to SpeedoDB — thanks! It will appear on the site after the next Pages deploy.";
                   await github.rest.issues.createComment({ owner, repo, issue_number: r.number, body });
-                  await github.rest.issues.update({ owner, repo, issue_number: r.number, state: 'closed' });
+                  await github.rest.issues.update({ owner, repo, issue_number: r.number,
+                    state: 'closed', state_reason: 'completed' });
                 }
               } catch (e) {
                 core.warning(`Issue #${r.number}: ${e.message}`);
