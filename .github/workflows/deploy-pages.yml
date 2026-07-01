@@ -8,7 +8,7 @@ on:
   # which does NOT trigger `push` workflows, so we redeploy via workflow_run
   # once the submission workflow finishes.
   workflow_run:
-    workflows: ["Resolve submissions"]
+    workflows: ["Add console submission"]
     types: [completed]
   workflow_dispatch:
 
@@ -18,12 +18,9 @@ permissions:
   id-token: write
 
 # Allow one concurrent deployment; don't cancel an in-progress one.
-# Let a newer deploy supersede an in-flight/queued one. With `false`, two deploys
-# firing close together (issue event + workflow_run + sweep) collide at the Pages
-# API ("in progress deployment"). We always want the latest data live anyway.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
