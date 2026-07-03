@@ -3182,7 +3182,7 @@ window.SPEEDO_DATA = {
       "notes": ""
     },
     {
-      "owner": "Chansey",
+      "owner": "Unknown",
       "model": "V1 Unpatched",
       "cpu": 2133,
       "gpu": 2147,
@@ -3461,7 +3461,7 @@ window.SPEEDO_DATA = {
       "notes": ""
     },
     {
-      "owner": "Unknown",
+      "owner": "Chansey",
       "model": "V1 Unpatched",
       "cpu": 2156,
       "gpu": 2149,
