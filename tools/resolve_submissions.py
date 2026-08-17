@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Resolve ALL open SpeedoDB submission issues in one pass.
 
-Lists every open submission issue via the GitHub API (both speedo/RAM
-submissions and GPU UV table submissions), validates each, appends the
-valid/unique ones to data/entries.csv or data/uv_entries.csv, and writes
+Lists every open submission issue via the GitHub API (speedo/RAM-bin
+submissions, GPU UV table submissions, and RAM timing/config submissions),
+validates each, appends the valid/unique ones to the matching CSV, and writes
 results.json describing what to do with each issue (comment + close, or
 comment error and leave open).
 
@@ -15,8 +15,9 @@ Env:
   GITHUB_TOKEN       token with repo + issues access (the workflow's GITHUB_TOKEN)
   GITHUB_REPOSITORY  "owner/repo"
 Outputs:
-  data/entries.csv     appended with new speedo/RAM rows
+  data/entries.csv     appended with new speedo/RAM-bin rows
   data/uv_entries.csv  appended with new GPU UV table rows
+  data/ram_entries.csv appended with new RAM timing/config rows
   results.json         [{number, title, status: added|duplicate|error, message, label}]
 """
 import csv
@@ -29,10 +30,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "entries.csv"
 UV_OUT = ROOT / "data" / "uv_entries.csv"
+RAM_OUT = ROOT / "data" / "ram_entries.csv"
 FREQS_SRC = ROOT / "data" / "gpu_freqs.json"
 RESULTS = ROOT / "results.json"
 FIELDS = ["platform", "owner", "model", "cpu", "gpu", "soc", "ram", "notes"]
 UV_FIELDS = ["platform", "owner", "gpu_speedo", "uv_table", "voltage_offset", "vmin", "notes", "volts"]
+RAM_FIELDS = [
+    "platform", "owner", "soc_speedo", "ram_type", "frequency", "vdd2", "vddq", "dvb_shift",
+    "soc_max_volt", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "tbreak",
+    "low_t1", "low_t3", "low_t4", "low_t5", "low_t6", "low_t7", "low_t8",
+    "read_latency_1333", "read_latency_1600", "read_latency_1866", "read_latency_2133",
+    "write_latency_1333", "write_latency_1600", "write_latency_1866", "write_latency_2133",
+    "notes",
+]
 
 PLATFORM_MAP = {"mariko": "mariko", "erista": "erista"}
 MARIKO_MODELS = {"OLED", "V2", "Lite"}
@@ -59,6 +69,44 @@ AUTO_TOKENS = {"0", "-", "x", "X", "auto", "Auto"}
 DISABLED_TOKENS = {"disabled", "Disabled", "off", "Off"}
 FREQS = json.loads(FREQS_SRC.read_text(encoding="utf-8"))
 
+# RAM fields: (issue-body label, csv key, Mariko-only?, is 0 a valid
+# "disabled" sentinel?, {platform: (lo, hi)}). Ranges are from the hoc-clk
+# overlay's misc_gui.cpp (RamSubmenuGui / RamTimingsSubmenuGui /
+# RamLatenciesSubmenuGui), except VDD2/VDDQ, whose source ranges come from an
+# unlocked debug build and are capped here to the safer values actually used
+# on release builds. Kept in sync with app.js's RAM_FIELD_GROUPS.
+RAM_FIELD_DEFS = [
+    ("Ram Max Clock", "frequency", False, False, {"mariko": (1600, 3400), "erista": (1600, 2400)}),
+    ("VDD2", "vdd2", False, False, {"mariko": (913, 1350), "erista": (913, 1350)}),
+    ("VDDQ", "vddq", True, False, {"mariko": (400, 750)}),
+    ("DVB Shift", "dvb_shift", False, False, {"mariko": (-4, 8), "erista": (-4, 8)}),
+    ("t1 tRCD", "t1", False, False, {"mariko": (0, 7), "erista": (0, 7)}),
+    ("t2 tRP", "t2", False, False, {"mariko": (0, 7), "erista": (0, 7)}),
+    ("t3 tRAS", "t3", False, False, {"mariko": (0, 9), "erista": (0, 9)}),
+    ("t4 tRRD", "t4", False, False, {"mariko": (0, 6), "erista": (0, 6)}),
+    ("t5 tRFC", "t5", False, False, {"mariko": (0, 10), "erista": (0, 5)}),
+    ("t6 tRTW", "t6", False, False, {"mariko": (0, 9), "erista": (0, 9)}),
+    ("t7 tWTR", "t7", False, False, {"mariko": (0, 9), "erista": (0, 9)}),
+    ("t8 tREFI", "t8", False, False, {"mariko": (0, 6), "erista": (0, 6)}),
+    ("tBreak", "tbreak", True, True, {"mariko": (1600, 3400)}),
+    ("Low t1 tRCD", "low_t1", True, False, {"mariko": (0, 7)}),
+    ("Low t3 tRAS", "low_t3", True, False, {"mariko": (0, 9)}),
+    ("Low t4 tRRD", "low_t4", True, False, {"mariko": (0, 6)}),
+    ("Low t5 tRFC", "low_t5", True, False, {"mariko": (0, 10)}),
+    ("Low t6 tRTW", "low_t6", True, False, {"mariko": (0, 9)}),
+    ("Low t7 tWTR", "low_t7", True, False, {"mariko": (0, 9)}),
+    ("Low t8 tREFI", "low_t8", True, False, {"mariko": (0, 6)}),
+    ("Read Latency 1333", "read_latency_1333", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Read Latency 1600", "read_latency_1600", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Read Latency 1866", "read_latency_1866", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Read Latency 2133", "read_latency_2133", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Write Latency 1333", "write_latency_1333", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Write Latency 1600", "write_latency_1600", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Write Latency 1866", "write_latency_1866", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+    ("Write Latency 2133", "write_latency_2133", False, True, {"mariko": (1600, 3300), "erista": (1600, 2400)}),
+]
+RAM_SOC_MAX_VOLT_OPTIONS = {0, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300}
+
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 REPO = os.environ.get("GITHUB_REPOSITORY", "")
 
@@ -75,14 +123,15 @@ def api_get(path):
 
 
 def issue_kind(body):
-    """Classify an issue body as a speedo submission, a UV submission, or
-    neither (None)."""
+    """Classify an issue body as a speedo, UV or RAM submission, or neither."""
     if "### Platform" not in body:
         return None
     if "### Model" in body:
         return "speedo"
     if "### Voltage table" in body:
         return "uv"
+    if "### RAM Type" in body:
+        return "ram"
     return None
 
 
@@ -124,6 +173,11 @@ def parse_issue(body):
 def clean_int(value):
     digits = re.sub(r"[^\d]", "", value or "")
     return digits if digits else ""
+
+
+def clean_signed_int(value):
+    v = (value or "").strip()
+    return v if re.fullmatch(r"-?\d+", v) else ""
 
 
 def validate_speedo(body):
@@ -254,6 +308,77 @@ def validate_uv(body):
     }, None
 
 
+def validate_ram(body):
+    """Return (row, None) if valid, else (None, error_message)."""
+    s = parse_issue(body)
+
+    def get(label):
+        v = (s.get(label) or "").strip()
+        return "" if v in ("", "_No response_") else v
+
+    platform = PLATFORM_MAP.get(get("Platform").lower())
+    if not platform:
+        return None, "Platform must be Mariko or Erista."
+
+    ram_type = get("RAM Type")
+    if not ram_type:
+        return None, "RAM Type is required."
+
+    soc = clean_int(get("SOC Speedo"))
+    if not soc:
+        return None, "SOC Speedo is required for a RAM submission."
+    lo, hi = RANGES[platform]["soc"]
+    if not (lo <= int(soc) <= hi):
+        return None, (f"SOC Speedo {soc} is outside the valid "
+                      f"{platform.title()} range ({lo}–{hi}).")
+
+    row = {
+        "platform": platform,
+        "owner": (get("Owner / handle") or "Anonymous")[:40],
+        "ram_type": ram_type[:20],
+        "soc_speedo": soc,
+    }
+
+    for label, key, mariko_only, zero_ok, ranges_by_platform in RAM_FIELD_DEFS:
+        if mariko_only and platform != "mariko":
+            row[key] = ""
+            continue
+        raw = get(label)
+        parser = clean_signed_int if key == "dvb_shift" else clean_int
+        cleaned = parser(raw)
+        if not cleaned:
+            if key == "frequency":
+                return None, "Ram Max Clock is required for a RAM submission."
+            row[key] = ""
+            continue
+        val = int(cleaned)
+        if zero_ok and val == 0:
+            row[key] = "0"
+            continue
+        lo_f, hi_f = ranges_by_platform[platform]
+        if not (lo_f <= val <= hi_f):
+            return None, (f"{label} {val} is outside the valid {platform.title()} "
+                          f"range ({lo_f}–{hi_f}).")
+        row[key] = str(val)
+
+    if platform == "mariko":
+        smv_raw = get("SoC Max Volt")
+        cleaned = clean_int(smv_raw)
+        if cleaned:
+            smv = int(cleaned)
+            if smv not in RAM_SOC_MAX_VOLT_OPTIONS:
+                return None, (f"SoC Max Volt {smv} is not one of the valid options "
+                              f"({', '.join(str(v) for v in sorted(RAM_SOC_MAX_VOLT_OPTIONS))}).")
+            row["soc_max_volt"] = str(smv)
+        else:
+            row["soc_max_volt"] = ""
+    else:
+        row["soc_max_volt"] = ""
+
+    row["notes"] = get("Notes").replace("\n", " ")[:240]
+    return row, None
+
+
 def row_key(r):
     return (r["platform"], (r.get("owner") or "").strip().lower(), r.get("model") or "",
             r.get("cpu") or "", r.get("gpu") or "", r.get("soc") or "", (r.get("ram") or "").strip())
@@ -262,6 +387,11 @@ def row_key(r):
 def uv_row_key(r):
     return (r["platform"], (r.get("owner") or "").strip().lower(), r.get("gpu_speedo") or "",
             r.get("uv_table") or "", r.get("voltage_offset") or "", r.get("vmin") or "", r.get("volts") or "")
+
+
+def ram_row_key(r):
+    return tuple((r.get(f) or "").strip().lower() if f in ("platform", "owner", "ram_type") else (r.get(f) or "")
+                 for f in RAM_FIELDS if f != "notes")
 
 
 # ---------- main ----------
@@ -284,49 +414,44 @@ def append_rows(path, fields, rows):
         w.writerows(rows)
 
 
-def main():
-    existing = load_existing(OUT)
-    seen = {row_key(r) for r in existing}
-    uv_existing = load_existing(UV_OUT)
-    uv_seen = {uv_row_key(r) for r in uv_existing}
+KINDS = {
+    "speedo": {"validate": validate_speedo, "key": row_key, "out": OUT, "fields": FIELDS, "label": "speedo-submission"},
+    "uv": {"validate": validate_uv, "key": uv_row_key, "out": UV_OUT, "fields": UV_FIELDS, "label": "uv-submission"},
+    "ram": {"validate": validate_ram, "key": ram_row_key, "out": RAM_OUT, "fields": RAM_FIELDS, "label": "ram-submission"},
+}
 
-    new_rows, new_uv_rows, results = [], [], []
+
+def main():
+    seen = {k: {v["key"](r) for r in load_existing(v["out"])} for k, v in KINDS.items()}
+    new_rows = {k: [] for k in KINDS}
+    results = []
+
     for it in list_open_submissions():
         num = it["number"]
         labels = [l["name"] for l in it.get("labels", [])]
         kind = issue_kind(it.get("body") or "")
-        base = {"number": num, "title": it.get("title", ""), "labels": labels, "kind": kind,
-                "label": "speedo-submission" if kind == "speedo" else "uv-submission"}
+        cfg = KINDS[kind]
+        base = {"number": num, "title": it.get("title", ""), "labels": labels, "kind": kind, "label": cfg["label"]}
 
-        if kind == "speedo":
-            row, err = validate_speedo(it.get("body") or "")
-        else:
-            row, err = validate_uv(it.get("body") or "")
-
+        row, err = cfg["validate"](it.get("body") or "")
         if err:
             results.append({**base, "status": "error", "message": err})
-        elif kind == "speedo" and row_key(row) in seen:
-            results.append({**base, "status": "duplicate", "message": ""})
-        elif kind == "uv" and uv_row_key(row) in uv_seen:
+        elif cfg["key"](row) in seen[kind]:
             results.append({**base, "status": "duplicate", "message": ""})
         else:
-            if kind == "speedo":
-                seen.add(row_key(row))
-                new_rows.append(row)
-            else:
-                uv_seen.add(uv_row_key(row))
-                new_uv_rows.append(row)
+            seen[kind].add(cfg["key"](row))
+            new_rows[kind].append(row)
             results.append({**base, "status": "added", "message": ""})
 
-    append_rows(OUT, FIELDS, new_rows)
-    append_rows(UV_OUT, UV_FIELDS, new_uv_rows)
+    for k, cfg in KINDS.items():
+        append_rows(cfg["out"], cfg["fields"], new_rows[k])
 
     RESULTS.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     counts = {}
     for r in results:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
-    print(f"Processed {len(results)} issues: {counts}; appended {len(new_rows)} speedo rows, "
-          f"{len(new_uv_rows)} UV rows.")
+    added = {k: len(v) for k, v in new_rows.items()}
+    print(f"Processed {len(results)} issues: {counts}; appended {added}.")
 
 
 if __name__ == "__main__":

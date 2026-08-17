@@ -136,6 +136,60 @@
     return cvbAutoVoltage(cvb[freqIndex], speedo, offsetMv, vminMv);
   }
 
+  // RAM timing/config fields, grouped for the modal UI. Ranges are from the
+  // hoc-clk overlay's misc_gui.cpp (RamSubmenuGui / RamTimingsSubmenuGui /
+  // RamLatenciesSubmenuGui), except VDD2/VDDQ — the source ranges come from
+  // an unlocked debug build and are capped here to the safer release values.
+  // issueLabel must match tools/resolve_submissions.py's RAM_FIELD_DEFS
+  // exactly (it becomes the "### <issueLabel>" section heading). Kept in
+  // sync with that file.
+  const RAM_FIELD_GROUPS = [
+    { title: "Voltages", fields: [
+      { key: "vdd2", uiLabel: "VDD2 (mV)", issueLabel: "VDD2", range: () => [913, 1350] },
+      { key: "vddq", uiLabel: "VDDQ (mV)", issueLabel: "VDDQ", range: () => [400, 750], marikoOnly: true },
+      { key: "dvb_shift", uiLabel: "DVB Shift", issueLabel: "DVB Shift", range: () => [-4, 8], signed: true },
+      { key: "soc_max_volt", uiLabel: "SoC Max Volt (mV)", issueLabel: "SoC Max Volt", marikoOnly: true,
+        type: "select", options: [0, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300] },
+    ]},
+    { title: "Timings", fields: [
+      { key: "t1", uiLabel: "t1 tRCD", issueLabel: "t1 tRCD", range: () => [0, 7] },
+      { key: "t2", uiLabel: "t2 tRP", issueLabel: "t2 tRP", range: () => [0, 7] },
+      { key: "t3", uiLabel: "t3 tRAS", issueLabel: "t3 tRAS", range: () => [0, 9] },
+      { key: "t4", uiLabel: "t4 tRRD", issueLabel: "t4 tRRD", range: () => [0, 6] },
+      { key: "t5", uiLabel: "t5 tRFC", issueLabel: "t5 tRFC", range: p => (p === "mariko" ? [0, 10] : [0, 5]) },
+      { key: "t6", uiLabel: "t6 tRTW", issueLabel: "t6 tRTW", range: () => [0, 9] },
+      { key: "t7", uiLabel: "t7 tWTR", issueLabel: "t7 tWTR", range: () => [0, 9] },
+      { key: "t8", uiLabel: "t8 tREFI", issueLabel: "t8 tREFI", range: () => [0, 6] },
+      { key: "tbreak", uiLabel: "tBreak (MHz, 0=disabled)", issueLabel: "tBreak", marikoOnly: true,
+        zeroOk: true, range: () => [1600, 3400] },
+    ]},
+    { title: "Low timings (Mariko only)", marikoOnly: true, fields: [
+      { key: "low_t1", uiLabel: "Low t1 tRCD", issueLabel: "Low t1 tRCD", range: () => [0, 7] },
+      { key: "low_t3", uiLabel: "Low t3 tRAS", issueLabel: "Low t3 tRAS", range: () => [0, 9] },
+      { key: "low_t4", uiLabel: "Low t4 tRRD", issueLabel: "Low t4 tRRD", range: () => [0, 6] },
+      { key: "low_t5", uiLabel: "Low t5 tRFC", issueLabel: "Low t5 tRFC", range: () => [0, 10] },
+      { key: "low_t6", uiLabel: "Low t6 tRTW", issueLabel: "Low t6 tRTW", range: () => [0, 9] },
+      { key: "low_t7", uiLabel: "Low t7 tWTR", issueLabel: "Low t7 tWTR", range: () => [0, 9] },
+      { key: "low_t8", uiLabel: "Low t8 tREFI", issueLabel: "Low t8 tREFI", range: () => [0, 6] },
+    ]},
+    { title: "Read Latency (MHz, 0=disabled)", fields: ["1333", "1600", "1866", "2133"].map(tier => ({
+      key: `read_latency_${tier}`, uiLabel: `${tier}RL`, issueLabel: `Read Latency ${tier}`, zeroOk: true,
+      range: p => (p === "mariko" ? [1600, 3300] : [1600, 2400]),
+    })) },
+    { title: "Write Latency (MHz, 0=disabled)", fields: ["1333", "1600", "1866", "2133"].map(tier => ({
+      key: `write_latency_${tier}`, uiLabel: `${tier}WL`, issueLabel: `Write Latency ${tier}`, zeroOk: true,
+      range: p => (p === "mariko" ? [1600, 3300] : [1600, 2400]),
+    })) },
+  ];
+  const RAM_FREQ_RANGE = { mariko: [1600, 3400], erista: [1600, 2400] };
+  const RAM_SOC_MAX_VOLT_OPTIONS = [0, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300];
+
+  function ramFieldsForPlatform(platform) {
+    return RAM_FIELD_GROUPS
+      .filter(g => !g.marikoOnly || platform === "mariko")
+      .flatMap(g => g.fields.filter(f => !f.marikoOnly || platform === "mariko"));
+  }
+
   const charts = { cpu: null, gpu: null, soc: null, ram: null, uv: null };
 
   /* ---------- data helpers ---------- */
@@ -150,6 +204,10 @@
 
   function platformUvEntries() {
     return (window.UV_DATA && window.UV_DATA[state.platform]) || [];
+  }
+
+  function platformRamEntries() {
+    return (window.RAM_DATA && window.RAM_DATA[state.platform]) || [];
   }
 
   // Canonical models are always shown (even with 0 entries, e.g. V1
@@ -439,14 +497,46 @@
     document.getElementById("uvRowCount").textContent = `${rows.length} submissions`;
   }
 
+  function fmtRam(v) { return v == null ? "—" : v; }
+
+  function renderRamTable(rows) {
+    const fields = ramFieldsForPlatform(state.platform);
+    const head = document.getElementById("ramTableHead");
+    head.innerHTML =
+      `<th>Owner</th><th class="num">SOC speedo</th><th>RAM Type</th><th class="num">Ram Max Clock</th>` +
+      fields.map(f => `<th class="num">${esc(f.uiLabel)}</th>`).join("") +
+      `<th>Notes</th>`;
+
+    const tb = document.querySelector("#ramTable tbody");
+    tb.innerHTML = "";
+    rows.forEach(r => {
+      const cells = [
+        `<td>${esc(r.owner)}</td>`,
+        `<td class="num">${fmtRam(r.soc_speedo)}</td>`,
+        `<td>${esc(r.ram_type) || "—"}</td>`,
+        `<td class="num">${fmtRam(r.frequency)}</td>`,
+        ...fields.map(f => `<td class="num">${fmtRam(r[f.key])}</td>`),
+        `<td class="notes">${esc(r.notes)}</td>`,
+      ];
+      const tr = document.createElement("tr");
+      tr.innerHTML = cells.join("");
+      tb.appendChild(tr);
+    });
+
+    document.getElementById("ramTableTitle").textContent =
+      `${PLATFORMS[state.platform].label} — RAM timings/config`;
+    document.getElementById("ramRowCount").textContent = `${rows.length} submissions`;
+  }
+
   function render() {
     renderPlatformButtons();
     renderViewButtons();
     document.getElementById("tabs").classList.toggle("hidden", state.view !== "speedo");
     document.getElementById("speedoView").classList.toggle("hidden", state.view !== "speedo");
     document.getElementById("uvView").classList.toggle("hidden", state.view !== "uv");
+    document.getElementById("ramView").classList.toggle("hidden", state.view !== "ram");
     document.getElementById("addBtn").classList.toggle("hidden", state.view !== "speedo");
-    document.querySelector("main").classList.toggle("main-wide", state.view === "uv");
+    document.querySelector("main").classList.toggle("main-wide", state.view === "uv" || state.view === "ram");
 
     if (state.view === "speedo") {
       const entries = platformEntries();
@@ -457,11 +547,14 @@
       renderRamChart(rows);
       renderTable(rows);
       refreshModalOptions();
-    } else {
+    } else if (state.view === "uv") {
       const uvRows = platformUvEntries();
       renderUvChart(uvRows);
       renderUvTable(uvRows);
       refreshUvModalOptions();
+    } else {
+      renderRamTable(platformRamEntries());
+      refreshRamModalOptions();
     }
   }
 
@@ -497,6 +590,35 @@
 
   function openUvModal() { document.getElementById("uvModal").classList.remove("hidden"); }
   function closeUvModal() { document.getElementById("uvModal").classList.add("hidden"); }
+
+  function refreshRamModalOptions() {
+    const platform = state.platform;
+    document.getElementById("ramTypeSelect").innerHTML =
+      PLATFORMS[platform].ram.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("");
+
+    const container = document.getElementById("ramFieldGroups");
+    container.innerHTML = RAM_FIELD_GROUPS
+      .filter(g => !g.marikoOnly || platform === "mariko")
+      .map(g => {
+        const fields = g.fields.filter(f => !f.marikoOnly || platform === "mariko");
+        if (!fields.length) return "";
+        const inputs = fields.map(f => {
+          if (f.type === "select") {
+            const opts = f.options
+              .map(o => `<option value="${o}">${o === 0 ? "Auto / not set" : o}</option>`).join("");
+            return `<label class="ram-field"><span>${esc(f.uiLabel)}</span>
+                       <select name="${f.key}">${opts}</select></label>`;
+          }
+          return `<label class="ram-field"><span>${esc(f.uiLabel)}</span>
+                     <input type="number" inputmode="numeric" name="${f.key}" placeholder="—" /></label>`;
+        }).join("");
+        return `<fieldset class="ram-field-group"><legend>${esc(g.title)}</legend>
+                  <div class="ram-field-grid">${inputs}</div></fieldset>`;
+      }).join("");
+  }
+
+  function openRamModal() { document.getElementById("ramModal").classList.remove("hidden"); }
+  function closeRamModal() { document.getElementById("ramModal").classList.add("hidden"); }
 
   // Identity of an entry, for duplicate detection. Numbers and form strings
   // normalize the same way ("1680" === 1680, blank === null).
@@ -640,6 +762,74 @@
     closeUvModal();
   }
 
+  function onRamSubmit(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const platform = state.platform;
+
+    const soc = (f.get("soc_speedo") || "").trim();
+    if (!soc) { alert("SOC Speedo is required."); return; }
+    const socRange = RANGES[platform].soc;
+    if (Number(soc) < socRange[0] || Number(soc) > socRange[1]) {
+      alert(`SOC Speedo ${soc} is outside the valid ` +
+        `${PLATFORMS[platform].label} range (${socRange[0]}–${socRange[1]}).`);
+      return;
+    }
+
+    const ramType = f.get("ram_type") || "";
+    if (!ramType) { alert("RAM Type is required."); return; }
+
+    const freq = (f.get("frequency") || "").trim();
+    if (!freq) { alert("Ram Max Clock is required."); return; }
+    const freqRange = RAM_FREQ_RANGE[platform];
+    if (Number(freq) < freqRange[0] || Number(freq) > freqRange[1]) {
+      alert(`Ram Max Clock ${freq} is outside the valid ` +
+        `${PLATFORMS[platform].label} range (${freqRange[0]}–${freqRange[1]}).`);
+      return;
+    }
+
+    // Every other field is optional — blank means "not provided".
+    const fields = ramFieldsForPlatform(platform);
+    const values = {};
+    for (const field of fields) {
+      const raw = (f.get(field.key) || "").trim();
+      if (raw === "") { values[field.key] = ""; continue; }
+      if (field.type === "select") { values[field.key] = raw; continue; } // trust the fixed dropdown
+      const val = Number(raw);
+      if (!Number.isInteger(val)) { alert(`${field.uiLabel} must be a whole number.`); return; }
+      if (field.zeroOk && val === 0) { values[field.key] = "0"; continue; }
+      const [lo, hi] = field.range(platform);
+      if (val < lo || val > hi) {
+        alert(`${field.uiLabel} ${val} is outside the valid ` +
+          `${PLATFORMS[platform].label} range (${lo}–${hi}).`);
+        return;
+      }
+      values[field.key] = String(val);
+    }
+
+    const bodyFields = [
+      ["Platform", PLATFORMS[platform].label],
+      ["Owner / handle", (f.get("owner") || "").trim()],
+      ["SOC Speedo", soc],
+      ["RAM Type", ramType],
+      ["Ram Max Clock", freq],
+      ...fields.map(field => [field.issueLabel, values[field.key]]),
+      ["Notes", (f.get("notes") || "").trim()],
+    ];
+    const body = bodyFields
+      .map(([h, v]) => `### ${h}\n\n${v || "_No response_"}`)
+      .join("\n\n");
+    const params = new URLSearchParams({
+      title: `[RAM Submission] ${PLATFORMS[platform].label} RAM timings/config`.trim(),
+      labels: "ram-submission",
+      body,
+    });
+    window.open(`https://github.com/${getRepo()}/issues/new?${params.toString()}`,
+      "_blank", "noopener");
+    e.target.reset();
+    closeRamModal();
+  }
+
   /* ---------- wire up ---------- */
 
   function init() {
@@ -688,8 +878,15 @@
       if (e.target.id === "uvModal") closeUvModal();
     });
 
+    document.getElementById("addRamBtn").onclick = openRamModal;
+    document.getElementById("ramCancelBtn").onclick = closeRamModal;
+    document.getElementById("ramForm").addEventListener("submit", onRamSubmit);
+    document.getElementById("ramModal").addEventListener("click", e => {
+      if (e.target.id === "ramModal") closeRamModal();
+    });
+
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape") { closeModal(); closeUvModal(); }
+      if (e.key === "Escape") { closeModal(); closeUvModal(); closeRamModal(); }
     });
 
     render();

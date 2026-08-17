@@ -1,0 +1,210 @@
+name: Add RAM timings/config to SpeedoDB
+description: Submit your RAM clock, voltages and timings alongside your SOC speedo. A bot adds it automatically.
+title: "[RAM Submission] RAM timings/config"
+labels: ["ram-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing! Fill in the fields matching the Horizon-OC overlay's
+        RAM settings menus (General / Timings / Latencies). Only Platform, RAM Type,
+        SOC Speedo and Ram Max Clock are required — leave anything else blank if you
+        haven't tuned it or don't know it. Fields marked **Mariko only** don't apply to
+        Erista and can be left blank there.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Mariko
+        - Erista
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner / handle
+      placeholder: your name or handle
+  - type: input
+    id: soc
+    attributes:
+      label: SOC Speedo
+      placeholder: e.g. 1650
+    validations:
+      required: true
+  - type: dropdown
+    id: ram_type
+    attributes:
+      label: RAM Type
+      description: "Mariko bins: AA-MGCL / AB-MGCL / AM-MGCJ / NEE / NME / WT:B / WT:E / WT:F — Erista bins: HB-MGCH / NLE / WT:C."
+      options:
+        - AA-MGCL
+        - AB-MGCL
+        - AM-MGCJ
+        - NEE
+        - NME
+        - WT:B
+        - WT:E
+        - WT:F
+        - HB-MGCH
+        - NLE
+        - WT:C
+    validations:
+      required: true
+  - type: input
+    id: frequency
+    attributes:
+      label: Ram Max Clock
+      description: "RAM clock in MHz. Mariko range 1600-3400, Erista range 1600-2400."
+      placeholder: e.g. 3200
+    validations:
+      required: true
+  - type: input
+    id: vdd2
+    attributes:
+      label: VDD2
+      description: "mV, both platforms. Range 913-1350."
+      placeholder: e.g. 1100
+  - type: input
+    id: vddq
+    attributes:
+      label: VDDQ
+      description: "mV, Mariko only. Range 400-750."
+      placeholder: e.g. 650
+  - type: input
+    id: dvb_shift
+    attributes:
+      label: DVB Shift
+      description: "Both platforms. Range -4 to 8."
+      placeholder: e.g. -2
+  - type: input
+    id: soc_max_volt
+    attributes:
+      label: SoC Max Volt
+      description: "mV, Mariko only. One of 1000/1025/1050/1075/1100/1125/1150/1175/1200/1225/1250/1275/1300, or blank for auto/do-not-override."
+      placeholder: e.g. 1050
+  - type: input
+    id: t1
+    attributes:
+      label: t1 tRCD
+      description: "Both platforms. Range 0-7."
+  - type: input
+    id: t2
+    attributes:
+      label: t2 tRP
+      description: "Both platforms. Range 0-7."
+  - type: input
+    id: t3
+    attributes:
+      label: t3 tRAS
+      description: "Both platforms. Range 0-9."
+  - type: input
+    id: t4
+    attributes:
+      label: t4 tRRD
+      description: "Both platforms. Range 0-6."
+  - type: input
+    id: t5
+    attributes:
+      label: t5 tRFC
+      description: "Both platforms. Range 0-10 Mariko, 0-5 Erista."
+  - type: input
+    id: t6
+    attributes:
+      label: t6 tRTW
+      description: "Both platforms. Range 0-9."
+  - type: input
+    id: t7
+    attributes:
+      label: t7 tWTR
+      description: "Both platforms. Range 0-9."
+  - type: input
+    id: t8
+    attributes:
+      label: t8 tREFI
+      description: "Both platforms. Range 0-6."
+  - type: input
+    id: tbreak
+    attributes:
+      label: tBreak
+      description: "MHz, Mariko only. 0/blank for disabled, otherwise range 1600-3400."
+  - type: input
+    id: low_t1
+    attributes:
+      label: Low t1 tRCD
+      description: "Mariko only. Range 0-7."
+  - type: input
+    id: low_t3
+    attributes:
+      label: Low t3 tRAS
+      description: "Mariko only. Range 0-9."
+  - type: input
+    id: low_t4
+    attributes:
+      label: Low t4 tRRD
+      description: "Mariko only. Range 0-6."
+  - type: input
+    id: low_t5
+    attributes:
+      label: Low t5 tRFC
+      description: "Mariko only. Range 0-10."
+  - type: input
+    id: low_t6
+    attributes:
+      label: Low t6 tRTW
+      description: "Mariko only. Range 0-9."
+  - type: input
+    id: low_t7
+    attributes:
+      label: Low t7 tWTR
+      description: "Mariko only. Range 0-9."
+  - type: input
+    id: low_t8
+    attributes:
+      label: Low t8 tREFI
+      description: "Mariko only. Range 0-6."
+  - type: input
+    id: read_1333
+    attributes:
+      label: Read Latency 1333
+      description: "MHz, both platforms. 0/blank for disabled, otherwise range 1600-3300 Mariko, 1600-2400 Erista."
+  - type: input
+    id: read_1600
+    attributes:
+      label: Read Latency 1600
+      description: "MHz, both platforms. Same range as above."
+  - type: input
+    id: read_1866
+    attributes:
+      label: Read Latency 1866
+      description: "MHz, both platforms. Same range as above."
+  - type: input
+    id: read_2133
+    attributes:
+      label: Read Latency 2133
+      description: "MHz, both platforms. Same range as above."
+  - type: input
+    id: write_1333
+    attributes:
+      label: Write Latency 1333
+      description: "MHz, both platforms. Same range as Read Latency."
+  - type: input
+    id: write_1600
+    attributes:
+      label: Write Latency 1600
+      description: "MHz, both platforms. Same range as Read Latency."
+  - type: input
+    id: write_1866
+    attributes:
+      label: Write Latency 1866
+      description: "MHz, both platforms. Same range as Read Latency."
+  - type: input
+    id: write_2133
+    attributes:
+      label: Write Latency 2133
+      description: "MHz, both platforms. Same range as Read Latency."
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      placeholder: anything notable about this config (stable? crashes? source of the timings?)

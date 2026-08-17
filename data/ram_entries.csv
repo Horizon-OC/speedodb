@@ -1,0 +1,1 @@
+platform,owner,soc_speedo,ram_type,frequency,vdd2,vddq,dvb_shift,soc_max_volt,t1,t2,t3,t4,t5,t6,t7,t8,tbreak,low_t1,low_t3,low_t4,low_t5,low_t6,low_t7,low_t8,read_latency_1333,read_latency_1600,read_latency_1866,read_latency_2133,write_latency_1333,write_latency_1600,write_latency_1866,write_latency_2133,notes

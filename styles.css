@@ -235,8 +235,13 @@ tbody td.notes { color: var(--muted); max-width: 320px; }
 .uv-freq-col { min-width: 52px; }
 #uvTable td.notes, #uvTable th:last-child { min-width: 260px; }
 
+/* RAM table */
+#ramTable td.notes, #ramTable th:last-child { min-width: 260px; }
+#ramTable th, #ramTable td { min-width: 62px; }
+
 /* Modal */
 .uv-modal-box { width: min(680px, 100%); }
+.ram-modal-box { width: min(760px, 100%); }
 .uv-volts-head { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
 .uv-volts-grid {
   display: grid;
@@ -250,6 +255,29 @@ tbody td.notes { color: var(--muted); max-width: 320px; }
 .uv-volt-field { margin: 0 !important; font-size: .72rem !important; }
 .uv-volt-field span { display: block; margin-bottom: 2px; }
 .uv-volt-field input { padding: 6px 8px !important; }
+
+.ram-field-group {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 4px;
+  margin: 0 0 14px;
+}
+.ram-field-group legend {
+  padding: 0 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.ram-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+}
+.ram-field { margin: 0 0 10px !important; font-size: .78rem !important; }
+.ram-field span { display: block; margin-bottom: 2px; }
+.ram-field input, .ram-field select { padding: 7px 8px !important; }
 
 /* Back button (bottom-left) */
 .back-btn {
@@ -290,15 +318,17 @@ tbody td.notes { color: var(--muted); max-width: 320px; }
   box-shadow: var(--shadow);
 }
 .modal-box h2 { margin: 0 0 16px; }
-#addForm label, #uvForm label { display: block; margin-bottom: 12px; font-size: .85rem; color: var(--muted); }
+#addForm label, #uvForm label, #ramForm label { display: block; margin-bottom: 12px; font-size: .85rem; color: var(--muted); }
 #addForm input, #addForm select, #addForm textarea,
-#uvForm input, #uvForm select, #uvForm textarea {
+#uvForm input, #uvForm select, #uvForm textarea,
+#ramForm input, #ramForm select, #ramForm textarea {
   display: block; width: 100%; margin-top: 4px;
   background: var(--bg); color: var(--text);
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
   font: inherit; outline: none;
 }
 #addForm input:focus, #addForm select:focus, #addForm textarea:focus,
-#uvForm input:focus, #uvForm select:focus, #uvForm textarea:focus { border-color: var(--accent-2); }
+#uvForm input:focus, #uvForm select:focus, #uvForm textarea:focus,
+#ramForm input:focus, #ramForm select:focus, #ramForm textarea:focus { border-color: var(--accent-2); }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin: 6px 0 12px; }

@@ -30,7 +30,8 @@ jobs:
       (github.event.issue.state == 'open' &&
        contains(github.event.issue.body, '### Platform') &&
        (contains(github.event.issue.body, '### Model') ||
-        contains(github.event.issue.body, '### Voltage table')))
+        contains(github.event.issue.body, '### Voltage table') ||
+        contains(github.event.issue.body, '### RAM Type')))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +51,7 @@ jobs:
             git reset --quiet --hard origin/main
             python tools/resolve_submissions.py
             python tools/build_data.py
-            git add data/entries.csv data/uv_entries.csv data.js
+            git add data/entries.csv data/uv_entries.csv data/ram_entries.csv data.js
             if git diff --cached --quiet; then
               echo "No data changes this run."
               pushed="nochange"; break
@@ -91,7 +92,8 @@ jobs:
                   await github.rest.issues.createComment({ owner, repo, issue_number: r.number,
                     body: `⚠️ Could not add this submission:\n\n> ${r.message}\n\nEdit the issue to fix it; it will be retried automatically.` });
                 } else {
-                  const thing = r.kind === 'uv' ? 'This UV table is' : 'This console is';
+                  const thing = r.kind === 'uv' ? 'This UV table is'
+                    : r.kind === 'ram' ? 'This RAM config is' : 'This console is';
                   const body = r.status === 'duplicate'
                     ? `ℹ️ ${thing} already in SpeedoDB — nothing to add. Thanks anyway!`
                     : "✅ Added to SpeedoDB — thanks! It will appear on the site after the next Pages deploy.";

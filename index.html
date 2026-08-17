@@ -39,6 +39,7 @@
   <nav id="viewSwitch" class="view-switch" role="tablist" aria-label="View">
     <button class="view-btn active" data-view="speedo" role="tab">Speedos</button>
     <button class="view-btn" data-view="uv" role="tab">GPU UV</button>
+    <button class="view-btn" data-view="ram" role="tab">RAM</button>
   </nav>
 
   <nav id="tabs" class="tabs" aria-label="Console type filter"></nav>
@@ -118,6 +119,27 @@
         </div>
       </section>
     </div>
+
+    <div id="ramView" class="hidden">
+      <section class="card table-card">
+        <div class="table-head">
+          <h2 id="ramTableTitle">RAM timings/config</h2>
+          <div class="table-head-actions">
+            <span id="ramRowCount" class="muted"></span>
+            <button id="addRamBtn" class="btn primary">+ Add RAM config</button>
+          </div>
+        </div>
+        <p class="muted small">RAM clock, voltages, timings and latency ceilings submitted
+           alongside each owner's SOC speedo, matching the Horizon-OC overlay's RAM settings
+           menus. "—" means that field wasn't provided.</p>
+        <div class="table-scroll">
+          <table id="ramTable">
+            <thead><tr id="ramTableHead"></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 
   <a class="back-btn" href="https://horizon-oc.github.io" title="Back to Horizon-OC">← Horizon-OC</a>
@@ -174,6 +196,31 @@
         </div>
         <p class="muted small">This opens a pre-filled GitHub issue. When you submit it, a bot
            validates the entry and adds it to the shared database automatically — just a normal issue.</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add RAM config modal -->
+  <div id="ramModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ramModalTitle">
+    <div class="modal-box ram-modal-box">
+      <h2 id="ramModalTitle">Add RAM timings/config</h2>
+      <form id="ramForm">
+        <label>Owner / handle <input name="owner" maxlength="40" /></label>
+        <div class="grid3">
+          <label>SOC Speedo <input name="soc_speedo" type="number" inputmode="numeric" required /></label>
+          <label>RAM Type <select name="ram_type" id="ramTypeSelect" required></select></label>
+          <label>Ram Max Clock (MHz) <input name="frequency" type="number" inputmode="numeric" required /></label>
+        </div>
+        <div id="ramFieldGroups"></div>
+        <label>Notes <textarea name="notes" rows="2" maxlength="240"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" id="ramCancelBtn" class="btn">Cancel</button>
+          <button type="submit" class="btn primary">Submit on GitHub →</button>
+        </div>
+        <p class="muted small">This opens a pre-filled GitHub issue. When you submit it, a bot
+           validates the entry and adds it to the shared database automatically — just a normal issue.
+           Only Owner, SOC Speedo, RAM Type and Ram Max Clock are required — leave anything else
+           blank if you don't know it.</p>
       </form>
     </div>
   </div>
