@@ -1,2 +1,3 @@
 platform,owner,soc_speedo,ram_type,frequency,vdd2,vddq,dvb_shift,soc_max_volt,t1,t2,t3,t4,t5,t6,t7,t8,tbreak,low_t1,low_t3,low_t4,low_t5,low_t6,low_t7,low_t8,read_latency_1333,read_latency_1600,read_latency_1866,read_latency_2133,write_latency_1333,write_latency_1600,write_latency_1866,write_latency_2133,notes
 mariko,Souldbminer,1709,AM-MGCJ,2833,1225,750,2,1100,4,2,8,1,4,4,3,6,0,,,,,,,,2000,2366,2666,2833,2000,2366,2666,2833,Cursed RAM
+mariko,Souldbminer,1682,AA-MGCL,2933,1175,640,2,0,4,4,5,4,5,6,7,6,2133,4,5,4,5,4,3,6,2000,2400,2666,2933,2000,2400,2666,2933,Swapped from WT:F to AA. Still needs a bit of tuning

@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 353 rows · erista: 63 rows
 // GPU UV submissions — mariko: 17 · erista: 7
-// RAM submissions — mariko: 1 · erista: 0
+// RAM submissions — mariko: 2 · erista: 0
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -4585,6 +4585,41 @@ window.RAM_DATA = {
       "write_latency_1600": 2366,
       "write_latency_1866": 2666,
       "write_latency_2133": 2833
+    },
+    {
+      "owner": "Souldbminer",
+      "ram_type": "AA-MGCL",
+      "notes": "Swapped from WT:F to AA. Still needs a bit of tuning",
+      "soc_speedo": 1682,
+      "frequency": 2933,
+      "vdd2": 1175,
+      "vddq": 640,
+      "dvb_shift": 2,
+      "soc_max_volt": 0,
+      "t1": 4,
+      "t2": 4,
+      "t3": 5,
+      "t4": 4,
+      "t5": 5,
+      "t6": 6,
+      "t7": 7,
+      "t8": 6,
+      "tbreak": 2133,
+      "low_t1": 4,
+      "low_t3": 5,
+      "low_t4": 4,
+      "low_t5": 5,
+      "low_t6": 4,
+      "low_t7": 3,
+      "low_t8": 6,
+      "read_latency_1333": 2000,
+      "read_latency_1600": 2400,
+      "read_latency_1866": 2666,
+      "read_latency_2133": 2933,
+      "write_latency_1333": 2000,
+      "write_latency_1600": 2400,
+      "write_latency_1866": 2666,
+      "write_latency_2133": 2933
     }
   ],
   "erista": []
