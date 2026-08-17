@@ -28,6 +28,7 @@ code { background: var(--bg-3); padding: 1px 5px; border-radius: 5px; font-size:
 .muted { color: var(--muted); }
 .small { font-size: .8rem; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
+.hidden { display: none !important; }
 
 /* Header */
 .site-header {
@@ -107,6 +108,27 @@ code { background: var(--bg-3); padding: 1px 5px; border-radius: 5px; font-size:
 .pf-name { font-size: 1.15rem; font-weight: 700; letter-spacing: .5px; }
 .pf-sub { font-size: .75rem; color: var(--muted); }
 
+/* View switch (Speedos / GPU UV) */
+.view-switch {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 4px 16px 0;
+}
+.view-btn {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--muted);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: .15s;
+}
+.view-btn:hover { color: var(--text); }
+.view-btn.active { background: var(--accent-2); color: #0e1117; border-color: var(--accent-2); }
+
 /* Console tabs */
 .tabs {
   display: flex;
@@ -131,6 +153,9 @@ code { background: var(--bg-3); padding: 1px 5px; border-radius: 5px; font-size:
 
 /* Layout */
 main { max-width: 1180px; margin: 0 auto; padding: 8px clamp(16px, 4vw, 40px) 40px; }
+/* The UV table can run to 20+ frequency columns — let it use the full window
+   width instead of the narrower speedo-table max-width. */
+main.main-wide { max-width: none; }
 
 .card {
   background: var(--bg-2);
@@ -169,11 +194,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 8px clamp(16px, 4vw, 40px) 40
 }
 .chart-card { padding: 16px; }
 .chart-wrap { position: relative; height: 300px; }
+.uv-chart-card { margin-bottom: 16px; }
+.uv-chart-wrap { height: 440px; }
 @media (max-width: 820px) { .charts { grid-template-columns: 1fr; } }
 
 /* Table */
 .table-card { padding: 16px; }
 .table-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.table-head-actions { display: flex; align-items: center; gap: 12px; }
 .table-scroll { overflow-x: auto; max-height: 560px; overflow-y: auto; border-radius: 10px; }
 table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 thead th {
@@ -202,6 +230,26 @@ tbody td.notes { color: var(--muted); max-width: 320px; }
   color: #0e1117;
   white-space: nowrap;
 }
+
+/* GPU UV table */
+.uv-freq-col { min-width: 52px; }
+#uvTable td.notes, #uvTable th:last-child { min-width: 260px; }
+
+/* Modal */
+.uv-modal-box { width: min(680px, 100%); }
+.uv-volts-head { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
+.uv-volts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.uv-volt-field { margin: 0 !important; font-size: .72rem !important; }
+.uv-volt-field span { display: block; margin-bottom: 2px; }
+.uv-volt-field input { padding: 6px 8px !important; }
 
 /* Back button (bottom-left) */
 .back-btn {
@@ -242,13 +290,15 @@ tbody td.notes { color: var(--muted); max-width: 320px; }
   box-shadow: var(--shadow);
 }
 .modal-box h2 { margin: 0 0 16px; }
-#addForm label { display: block; margin-bottom: 12px; font-size: .85rem; color: var(--muted); }
-#addForm input, #addForm select, #addForm textarea {
+#addForm label, #uvForm label { display: block; margin-bottom: 12px; font-size: .85rem; color: var(--muted); }
+#addForm input, #addForm select, #addForm textarea,
+#uvForm input, #uvForm select, #uvForm textarea {
   display: block; width: 100%; margin-top: 4px;
   background: var(--bg); color: var(--text);
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
   font: inherit; outline: none;
 }
-#addForm input:focus, #addForm select:focus, #addForm textarea:focus { border-color: var(--accent-2); }
+#addForm input:focus, #addForm select:focus, #addForm textarea:focus,
+#uvForm input:focus, #uvForm select:focus, #uvForm textarea:focus { border-color: var(--accent-2); }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin: 6px 0 12px; }

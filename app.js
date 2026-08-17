@@ -1,16 +1,22 @@
-/* SpeedoDB — client-side app. Data comes from window.SPEEDO_DATA (data.js),
-   generated from data/entries.csv. New entries are submitted as GitHub issues
-   (see "Add entry"), which a workflow validates and commits to the dataset. */
+/* SpeedoDB — client-side app. Speedo/RAM data comes from window.SPEEDO_DATA and
+   GPU UV table data from window.UV_DATA/window.UV_FREQS (all in data.js,
+   generated from data/entries.csv and data/uv_entries.csv). New entries are
+   submitted as GitHub issues ("Add entry" / "Add UV table"), which a workflow
+   validates and commits to the dataset. */
 (function () {
   "use strict";
 
   const PLATFORMS = {
     // sort: default table sort key for the platform. Erista defaults to GPU
     // speedo, which is the more reliable metric on those units; Mariko uses SOC.
+    // uvTables: named UV table presets, kept in sync with
+    // tools/resolve_submissions.py's UV_TABLES.
     mariko: { label: "Mariko", order: ["OLED", "V2", "Lite"], sort: "soc",
-      ram: ["AA-MGCL", "AB-MGCL", "AM-MGCJ", "NEE", "NME", "WT:B", "WT:E", "WT:F"] },
+      ram: ["AA-MGCL", "AB-MGCL", "AM-MGCJ", "NEE", "NME", "WT:B", "WT:E", "WT:F"],
+      uvTables: ["None", "SLT", "HiOPT", "HiOPT - 15", "High UV"] },
     erista: { label: "Erista", order: ["V1 Unpatched", "V1 Patched"], sort: "gpu",
-      ram: ["HB-MGCH", "NLE", "WT:C"] },
+      ram: ["HB-MGCH", "NLE", "WT:C"],
+      uvTables: ["None", "HiOPT", "HiOPT - 15", "High UV"] },
   };
 
   // Repo used for issue-submission links. Auto-detected on GitHub Pages, with
@@ -36,14 +42,113 @@
     search: "",
     sortKey: "soc",
     sortDir: -1, // -1 desc, 1 asc
+    view: "speedo", // "speedo" | "uv"
   };
 
-  const charts = { cpu: null, gpu: null, soc: null, ram: null };
+  // Sane bounds for a per-frequency-step GPU voltage entry (mV) and for the
+  // flat voltage offset applied on top of the whole curve. Kept in sync with
+  // tools/resolve_submissions.py, which is the authoritative check.
+  const UV_VOLT_RANGE = [300, 1300];
+  const UV_OFFSET_RANGE = [-200, 200];
+  // GPU Vmin bounds, matching the hoc-clk overlay's own per-platform sliders.
+  const UV_VMIN_RANGE = { mariko: [400, 795], erista: [650, 875] };
+
+  // CVB (core-voltage-bias) coefficients — [baseUv, c1, c2, c3, c4, c5] per
+  // row, same layout as nvgpu's gm20b cvb_coefficients — used to compute the
+  // stock driver voltage for a step left on "Auto", for the curve graph.
+  // One row per frequency step *covered by the real stock DVFS table*:
+  // Mariko's 18 rows line up 1:1 with uvFreqs()[0..17] (76800-1305600kHz);
+  // anything past that is OC-only headroom with no stock curve. Erista's
+  // rows only line up 1:1 through row 11 (921600kHz) — beyond that, the
+  // stock hardware table has steps (960000, 1036800...) that we deliberately
+  // don't expose as selectable frequencies, so row order and our pruned
+  // frequency list diverge and can't be used for Auto-fill.
+  const GPU_CVB = {
+    mariko: [
+      [480000, 0, 0, 0, 0, 0],
+      [480000, 0, 0, 0, 0, 0],
+      [480000, 0, 0, 0, 0, 0],
+      [738712, -7304, -552, 119, -3750, -2],
+      [758712, -7304, -552, 119, -3750, -2],
+      [778712, -7304, -552, 119, -3750, -2],
+      [798712, -7304, -552, 119, -3750, -2],
+      [818712, -7304, -552, 119, -3750, -2],
+      [838712, -7304, -552, 119, -3750, -2],
+      [880210, -7955, -584, 0, -2849, 39],
+      [926398, -8892, -602, -60, -384, -93],
+      [970060, -10108, -614, -179, 1508, -13],
+      [1060665, -16075, -497, -179, 3213, 9],
+      [1061475, -12688, -648, 0, 1077, 40],
+      [1094475, -12688, -648, 0, 1077, 40],
+      [1124475, -12688, -648, 0, 1077, 40],
+      [1142060, -12688, -648, 0, 1077, 40],
+      [1163644, -12688, -648, 0, 1077, 40],
+    ],
+    erista: [
+      [480000, 0, 0, 0, 0, 0],
+      [480000, 0, 0, 0, 0, 0],
+      [480000, 0, 0, 0, 0, 0],
+      [738712, -7304, -552, 119, -3750, -2],
+      [758712, -7304, -552, 119, -3750, -2],
+      [778712, -7304, -552, 119, -3750, -2],
+      [798712, -7304, -552, 119, -3750, -2],
+      [818712, -7304, -552, 119, -3750, -2],
+      [838712, -7304, -552, 119, -3750, -2],
+      [880210, -7955, -584, 0, -2849, 39],
+      [926398, -8892, -602, -60, -384, -93],
+      [970060, -10108, -614, -179, 1508, -13],
+    ],
+  };
+
+  function floorDiv(a, b) { return Math.floor(a / b); }
+  // Port of the reference calculator's div_round_closest: round-half-away-
+  // from-zero integer division.
+  function divRoundClosest(value, scale) {
+    return value > 0 ? floorDiv(value + floorDiv(scale, 2), scale)
+                      : floorDiv(value - floorDiv(scale, 2), scale);
+  }
+  function round5(n) { return Math.ceil(n / 5000) * 5000; }
+
+  // Stock ("Auto") GPU voltage for one frequency step, at the worst-case
+  // 90°C thermal bracket — the highest (most conservative) of the reference
+  // script's 6 temperature floors, and the one most representative of real
+  // sustained-load behavior. offsetMv is folded into the base coefficient
+  // exactly as the reference script does (subtracted before the curve math).
+  function cvbAutoVoltage(cvb, speedo, offsetMv, vminMv) {
+    const base = cvb[0] - offsetMv * 1000;
+    let mv = divRoundClosest(cvb[2] * speedo, 100);
+    mv = divRoundClosest((mv + cvb[1]) * speedo, 100) + base;
+
+    const t = 90;
+    let mvt = divRoundClosest(cvb[3] * speedo, 100) + cvb[4] + divRoundClosest(cvb[5] * t, 10);
+    mvt = divRoundClosest(mvt * t, 10);
+
+    const finalMv = round5(mv + mvt) / 1000;
+    return Math.max(finalMv, vminMv);
+  }
+
+  // null if this step has no stock curve coverage (OC-only headroom, or an
+  // Erista step past the hardware/UI alignment break described above).
+  function autoVoltageFor(platform, freqIndex, speedo, offsetMv, vminMv) {
+    const cvb = GPU_CVB[platform];
+    if (!cvb || freqIndex >= cvb.length || speedo == null || vminMv == null) return null;
+    return cvbAutoVoltage(cvb[freqIndex], speedo, offsetMv, vminMv);
+  }
+
+  const charts = { cpu: null, gpu: null, soc: null, ram: null, uv: null };
 
   /* ---------- data helpers ---------- */
 
   function platformEntries() {
     return window.SPEEDO_DATA[state.platform] || [];
+  }
+
+  function uvFreqs() {
+    return (window.UV_FREQS && window.UV_FREQS[state.platform]) || [];
+  }
+
+  function platformUvEntries() {
+    return (window.UV_DATA && window.UV_DATA[state.platform]) || [];
   }
 
   // Canonical models are always shown (even with 0 entries, e.g. V1
@@ -242,16 +347,121 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   }
 
+  function renderViewButtons() {
+    document.querySelectorAll(".view-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.view === state.view);
+    });
+  }
+
+  function fmtVolt(v) {
+    if (v == null) return "—";
+    if (v === "disabled") return "Off";
+    return v;
+  }
+
+  // One point per frequency step: the submitted value if set, the computed
+  // stock voltage if left on Auto and within CVB coverage, or null (a true
+  // gap in the line) for a Disabled step or an Auto step with no coverage.
+  function uvCurve(platform, freqs, r) {
+    return freqs.map((f, i) => {
+      const v = r.volts[i];
+      if (v === "disabled") return null;
+      if (v != null) return v;
+      return autoVoltageFor(platform, i, r.gpu_speedo, r.voltage_offset || 0, r.vmin);
+    });
+  }
+
+  function renderUvChart(rows) {
+    const freqs = uvFreqs();
+    const labels = freqs.map(f => `${Math.floor(f / 1000)}MHz`);
+
+    if (charts.uv) charts.uv.destroy();
+    if (!rows.length) { charts.uv = null; return; }
+
+    const datasets = rows.map(r => {
+      const color = ramColor(r.owner);
+      return {
+        label: r.owner,
+        data: uvCurve(state.platform, freqs, r),
+        borderColor: color, backgroundColor: color,
+        pointRadius: 2, pointHoverRadius: 4, borderWidth: 1.5, tension: 0.15,
+      };
+    });
+
+    charts.uv = new Chart(document.getElementById("uvChart"), {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "nearest", intersect: false },
+        plugins: {
+          legend: { position: "right", labels: { color: "#e6edf3", boxWidth: 12, font: { size: 11 } } },
+          tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} mV` } },
+        },
+        scales: {
+          x: { ticks: { color: "#8b97a7", font: { size: 10 } }, grid: { display: false } },
+          y: { ticks: { color: "#8b97a7" }, grid: { color: "#2a3140" },
+               title: { display: true, text: "mV", color: "#8b97a7" } },
+        },
+      },
+    });
+  }
+
+  function renderUvTable(rows) {
+    const freqs = uvFreqs();
+    const head = document.getElementById("uvTableHead");
+    head.innerHTML =
+      `<th>Owner</th><th class="num">GPU speedo</th><th>UV table</th><th class="num">Offset</th><th class="num">Vmin</th>` +
+      freqs.map(f => `<th class="num uv-freq-col" title="${f} kHz">${Math.floor(f / 1000)}MHz</th>`).join("") +
+      `<th>Notes</th>`;
+
+    const tb = document.querySelector("#uvTable tbody");
+    tb.innerHTML = "";
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+      const offset = r.voltage_offset || 0;
+      const cells = [
+        `<td>${esc(r.owner)}</td>`,
+        `<td class="num">${r.gpu_speedo ?? "—"}</td>`,
+        `<td>${esc(r.uv_table || "None")}</td>`,
+        `<td class="num">${offset > 0 ? "+" + offset : offset}</td>`,
+        `<td class="num">${r.vmin ?? "—"}</td>`,
+        ...freqs.map((f, i) => `<td class="num uv-freq-col">${fmtVolt(r.volts[i])}</td>`),
+        `<td class="notes">${esc(r.notes)}</td>`,
+      ];
+      tr.innerHTML = cells.join("");
+      tb.appendChild(tr);
+    });
+
+    document.getElementById("uvTableTitle").textContent =
+      `${PLATFORMS[state.platform].label} — GPU UV tables`;
+    document.getElementById("uvRowCount").textContent = `${rows.length} submissions`;
+  }
+
   function render() {
-    const entries = platformEntries();
     renderPlatformButtons();
-    renderTabs(entries);
-    const rows = filterByType(entries);
-    renderStats(rows);
-    SPEEDOS.forEach(def => renderSpeedoChart(def, rows));
-    renderRamChart(rows);
-    renderTable(rows);
-    refreshModalOptions();
+    renderViewButtons();
+    document.getElementById("tabs").classList.toggle("hidden", state.view !== "speedo");
+    document.getElementById("speedoView").classList.toggle("hidden", state.view !== "speedo");
+    document.getElementById("uvView").classList.toggle("hidden", state.view !== "uv");
+    document.getElementById("addBtn").classList.toggle("hidden", state.view !== "speedo");
+    document.querySelector("main").classList.toggle("main-wide", state.view === "uv");
+
+    if (state.view === "speedo") {
+      const entries = platformEntries();
+      renderTabs(entries);
+      const rows = filterByType(entries);
+      renderStats(rows);
+      SPEEDOS.forEach(def => renderSpeedoChart(def, rows));
+      renderRamChart(rows);
+      renderTable(rows);
+      refreshModalOptions();
+    } else {
+      const uvRows = platformUvEntries();
+      renderUvChart(uvRows);
+      renderUvTable(uvRows);
+      refreshUvModalOptions();
+    }
   }
 
   /* ---------- add-entry modal → GitHub issue ---------- */
@@ -269,6 +479,23 @@
 
   function openModal() { document.getElementById("modal").classList.remove("hidden"); }
   function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+  function refreshUvModalOptions() {
+    const tables = PLATFORMS[state.platform].uvTables;
+    document.getElementById("uvTableSelect").innerHTML =
+      tables.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join("");
+
+    // Text (not number) input: besides an mV value, a step can be typed as
+    // "disabled"/"off" — kept distinct from a blank field, which means Auto.
+    const grid = document.getElementById("uvVoltsGrid");
+    grid.innerHTML = uvFreqs().map(f =>
+      `<label class="uv-volt-field"><span>${Math.floor(f / 1000)}MHz</span>
+         <input type="text" inputmode="numeric" name="v_${f}" placeholder="Auto" /></label>`
+    ).join("");
+  }
+
+  function openUvModal() { document.getElementById("uvModal").classList.remove("hidden"); }
+  function closeUvModal() { document.getElementById("uvModal").classList.add("hidden"); }
 
   // Identity of an entry, for duplicate detection. Numbers and form strings
   // normalize the same way ("1680" === 1680, blank === null).
@@ -332,6 +559,86 @@
     closeModal();
   }
 
+  function onUvSubmit(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const gpu = (f.get("gpu_speedo") || "").trim();
+    if (!gpu) { alert("GPU speedo is required."); return; }
+
+    const r = RANGES[state.platform];
+    if (Number(gpu) < r.gpu[0] || Number(gpu) > r.gpu[1]) {
+      alert(`GPU speedo ${gpu} is outside the valid ` +
+        `${PLATFORMS[state.platform].label} range (${r.gpu[0]}–${r.gpu[1]}).`);
+      return;
+    }
+
+    const offsetRaw = (f.get("voltage_offset") || "0").trim();
+    if (!/^-?\d+$/.test(offsetRaw)) { alert("Voltage offset must be a whole number."); return; }
+    const offset = Number(offsetRaw);
+    if (offset < UV_OFFSET_RANGE[0] || offset > UV_OFFSET_RANGE[1]) {
+      alert(`Voltage offset ${offset} is outside the sane range ` +
+        `(${UV_OFFSET_RANGE[0]}–${UV_OFFSET_RANGE[1]} mV).`);
+      return;
+    }
+    const uvTable = f.get("uv_table") || "None";
+
+    const vmin = (f.get("vmin") || "").trim();
+    if (!vmin) { alert("Vmin is required."); return; }
+    const vminRange = UV_VMIN_RANGE[state.platform];
+    if (Number(vmin) < vminRange[0] || Number(vmin) > vminRange[1]) {
+      alert(`Vmin ${vmin} is outside the valid ` +
+        `${PLATFORMS[state.platform].label} range (${vminRange[0]}–${vminRange[1]}).`);
+      return;
+    }
+
+    // Each per-step field is blank (Auto), "disabled"/"off" (Disabled — kept
+    // distinct from Auto), or an mV number.
+    const freqs = uvFreqs();
+    const volts = freqs.map(fr => {
+      const raw = (f.get(`v_${fr}`) || "").trim();
+      if (raw === "") return null;
+      if (/^(disabled|off)$/i.test(raw)) return "disabled";
+      return Number(raw);
+    });
+    if (volts.every(v => v === null)) {
+      alert("Enter at least one voltage value.");
+      return;
+    }
+    for (let i = 0; i < volts.length; i++) {
+      const v = volts[i];
+      if (v === null || v === "disabled") continue;
+      if (!Number.isFinite(v) || (v < UV_VOLT_RANGE[0] || v > UV_VOLT_RANGE[1])) {
+        alert(`Voltage for ${Math.floor(freqs[i] / 1000)}MHz ('${f.get(`v_${freqs[i]}`)}') must be a ` +
+          `number in the sane range (${UV_VOLT_RANGE[0]}–${UV_VOLT_RANGE[1]} mV), or "disabled".`);
+        return;
+      }
+    }
+
+    const voltsText = volts.map(v => (v === null ? "0" : String(v))).join(", ");
+    const fields = [
+      ["Platform", PLATFORMS[state.platform].label],
+      ["Owner / handle", (f.get("owner") || "").trim()],
+      ["GPU speedo", gpu],
+      ["UV table", uvTable],
+      ["Voltage offset", String(offset)],
+      ["Vmin", vmin],
+      ["Voltage table", voltsText],
+      ["Notes", (f.get("notes") || "").trim()],
+    ];
+    const body = fields
+      .map(([h, v]) => `### ${h}\n\n${v || "_No response_"}`)
+      .join("\n\n");
+    const params = new URLSearchParams({
+      title: `[UV Submission] ${PLATFORMS[state.platform].label} GPU voltage table`.trim(),
+      labels: "uv-submission",
+      body,
+    });
+    window.open(`https://github.com/${getRepo()}/issues/new?${params.toString()}`,
+      "_blank", "noopener");
+    e.target.reset();
+    closeUvModal();
+  }
+
   /* ---------- wire up ---------- */
 
   function init() {
@@ -362,13 +669,27 @@
       };
     });
 
+    document.querySelectorAll(".view-btn").forEach(btn => {
+      btn.onclick = () => { state.view = btn.dataset.view; render(); };
+    });
+
     document.getElementById("addBtn").onclick = openModal;
     document.getElementById("cancelBtn").onclick = closeModal;
     document.getElementById("addForm").addEventListener("submit", onSubmit);
     document.getElementById("modal").addEventListener("click", e => {
       if (e.target.id === "modal") closeModal();
     });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+    document.getElementById("addUvBtn").onclick = openUvModal;
+    document.getElementById("uvCancelBtn").onclick = closeUvModal;
+    document.getElementById("uvForm").addEventListener("submit", onUvSubmit);
+    document.getElementById("uvModal").addEventListener("click", e => {
+      if (e.target.id === "uvModal") closeUvModal();
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") { closeModal(); closeUvModal(); }
+    });
 
     render();
   }

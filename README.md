@@ -7,38 +7,48 @@ data, with averages and distribution charts by platform and console type.
 - **Erista** — V1 (Unpatched / Patched)
 
 Live charts cover CPU, GPU and SOC speedo distributions plus RAM bin breakdown,
-recomputed for the selected platform and console type. Part of the
+recomputed for the selected platform and console type. A separate **GPU UV**
+tab holds a crowdsourced database of per-frequency GPU undervolt tables,
+submitted alongside each owner's GPU speedo. Part of the
 [Horizon-OC](https://horizon-oc.github.io) project.
 
 ## How it works
 
-The site is fully static — no server. The dataset lives in
-[`data/entries.csv`](data/entries.csv) and is compiled into [`data.js`](data.js)
-(`window.SPEEDO_DATA`), which the page loads via a plain `<script>` tag (works on
-Pages and from `file://`).
+The site is fully static — no server. The datasets live in
+[`data/entries.csv`](data/entries.csv) (speedo/RAM) and
+[`data/uv_entries.csv`](data/uv_entries.csv) (GPU UV tables), compiled into
+[`data.js`](data.js) (`window.SPEEDO_DATA` / `window.UV_DATA` /
+`window.UV_FREQS`), which the page loads via a plain `<script>` tag (works on
+Pages and from `file://`). The GPU frequency-step lists themselves (30 steps
+for Mariko, 24 for Erista) are the single source of truth in
+[`data/gpu_freqs.json`](data/gpu_freqs.json).
 
 ```text
-data/entries.csv  ──(tools/build_data.py)──▶  data.js  ──▶  index.html + app.js
+data/entries.csv     ──┐
+data/uv_entries.csv  ──┼─(tools/build_data.py)──▶  data.js  ──▶  index.html + app.js
+data/gpu_freqs.json  ──┘
 ```
 
 ### Adding entries (for everyone)
 
-The **+ Add entry** button opens a pre-filled submission issue (matching the
-[issue form](.github/ISSUE_TEMPLATE/add-console.yml)). The
+The **+ Add entry** / **+ Add UV table** buttons open a pre-filled submission
+issue (matching the [speedo issue form](.github/ISSUE_TEMPLATE/add-console.yml)
+or the [UV issue form](.github/ISSUE_TEMPLATE/add-uv.yml)). The
 [`resolve-submissions`](.github/workflows/resolve-submissions.yml) workflow then,
 on any issue event (plus a 3-hourly safety sweep and manual dispatch),
-processes **every open submission in a single run**:
+processes **every open submission of both kinds in a single run**:
 
 1. lists all open submission issues via the API (`tools/resolve_submissions.py`),
-2. validates each and appends the valid, unique ones to `data/entries.csv`,
+2. validates each and appends the valid, unique ones to `data/entries.csv` or
+   `data/uv_entries.csv`,
 3. regenerates `data.js` (`tools/build_data.py`) and pushes once,
-4. labels, comments on, and closes each issue (leaving invalid ones open with an
-   explanation).
+4. labels (`speedo-submission` / `uv-submission`), comments on, and closes each
+   issue (leaving invalid ones open with an explanation).
 
 Handling the whole backlog per run — rather than one run per issue — means many
 submissions arriving at once never race to push. The workflow also applies the
-`speedo-submission` label itself, since submitters usually can't set labels.
-After the push, the Pages deploy publishes the new data automatically.
+label itself, since submitters usually can't set labels. After the push, the
+Pages deploy publishes the new data automatically.
 
 To clear a backlog immediately, run the workflow manually: Actions →
 **Resolve submissions** → *Run workflow*.

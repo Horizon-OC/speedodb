@@ -1,0 +1,88 @@
+name: Add a GPU UV table to SpeedoDB
+description: Submit your per-frequency GPU undervolt table alongside your GPU speedo. A bot adds it automatically.
+title: "[UV Submission] GPU voltage table"
+labels: ["uv-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing! Paste the per-frequency-step GPU voltages (mV) from your
+        own tuned table — e.g. from the hoc-clk overlay's per-step GPU voltage screen.
+        A GPU speedo value is required, since the whole point of this table is comparing
+        undervolt headroom against silicon quality.
+
+        **Voltage table format:** one value per line, or comma-separated, in the exact
+        order below for your platform. Use `0` (or leave the entry blank/`-`) for a step
+        left on "Auto", or `disabled`/`off` for a step that's turned off entirely — the
+        two are recorded separately, not lumped together.
+
+        - **Mariko** (24 values): `76800, 153600, 230400, 307200, 384000, 460800, 537600,
+          614400, 691200, 768000, 844800, 921600, 998400, 1075200, 1152000, 1228800,
+          1267200, 1305600, 1344000, 1382400, 1420800, 1459200, 1497600, 1536000` kHz
+        - **Erista** (14 values): `76800, 153600, 230400, 307200, 384000, 460800, 537600,
+          614400, 691200, 768000, 844800, 921600, 998400, 1075200` kHz
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Mariko
+        - Erista
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner / handle
+      placeholder: your name or handle
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU speedo
+      placeholder: e.g. 1695
+    validations:
+      required: true
+  - type: dropdown
+    id: uv_table
+    attributes:
+      label: UV table
+      description: "Which preset your table is based on, if any. SLT is Mariko-only; leave as None if you built your own table from scratch."
+      options:
+        - None
+        - SLT
+        - HiOPT
+        - HiOPT - 15
+        - High UV
+    validations:
+      required: false
+  - type: input
+    id: offset
+    attributes:
+      label: Voltage offset
+      description: Flat mV offset applied on top of the table, if any (can be negative). Leave blank for 0.
+      placeholder: e.g. -15, 15, or 0
+  - type: input
+    id: vmin
+    attributes:
+      label: Vmin
+      description: "Your GPU Vmin setting (mV). Mariko range 400-795, Erista range 650-875."
+      placeholder: e.g. 480
+    validations:
+      required: true
+  - type: textarea
+    id: volts
+    attributes:
+      label: Voltage table
+      description: One value (mV) per line or comma-separated, in platform order (see above). Use 0/blank/- for Auto, disabled/off for Disabled.
+      placeholder: |
+        600
+        600
+        600
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      placeholder: anything notable about this table (stable? crashes above a step? etc.)
