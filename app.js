@@ -109,17 +109,18 @@
   }
   function round5(n) { return Math.ceil(n / 5000) * 5000; }
 
-  // Stock ("Auto") GPU voltage for one frequency step, at the worst-case
-  // 90°C thermal bracket — the highest (most conservative) of the reference
-  // script's 6 temperature floors, and the one most representative of real
-  // sustained-load behavior. offsetMv is folded into the base coefficient
-  // exactly as the reference script does (subtracted before the curve math).
+  // Stock ("Auto") GPU voltage for one frequency step, at the 30°C thermal
+  // bracket — verified against a known-good data point (Mariko, speedo 1682,
+  // 1305MHz, High UV: 775mV at offset 0, 755mV at offset -20). offsetMv adds
+  // directly onto the base coefficient (our field's sign convention: negative
+  // = undervolt = lower voltage) — the *opposite* sign from the reference
+  // script's own "subtract offset" line, which uses the inverse convention.
   function cvbAutoVoltage(cvb, speedo, offsetMv, vminMv) {
-    const base = cvb[0] - offsetMv * 1000;
+    const base = cvb[0] + offsetMv * 1000;
     let mv = divRoundClosest(cvb[2] * speedo, 100);
     mv = divRoundClosest((mv + cvb[1]) * speedo, 100) + base;
 
-    const t = 90;
+    const t = 30;
     let mvt = divRoundClosest(cvb[3] * speedo, 100) + cvb[4] + divRoundClosest(cvb[5] * t, 10);
     mvt = divRoundClosest(mvt * t, 10);
 
