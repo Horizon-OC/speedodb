@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 353 rows · erista: 63 rows
 // GPU UV submissions — mariko: 17 · erista: 7
-// RAM submissions — mariko: 2 · erista: 0
+// RAM submissions — mariko: 2 · erista: 1
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -4622,5 +4622,41 @@ window.RAM_DATA = {
       "write_latency_2133": 2933
     }
   ],
-  "erista": []
+  "erista": [
+    {
+      "owner": "Souldbminer",
+      "ram_type": "HB-MGCH",
+      "notes": "Doesn't benefit from HOC compared to EOS.",
+      "soc_speedo": 2025,
+      "frequency": 2188,
+      "vdd2": 1175,
+      "vddq": null,
+      "dvb_shift": 5,
+      "soc_max_volt": null,
+      "t1": 4,
+      "t2": 5,
+      "t3": 9,
+      "t4": 1,
+      "t5": 2,
+      "t6": 6,
+      "t7": 7,
+      "t8": 6,
+      "tbreak": null,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": 2188,
+      "read_latency_1866": null,
+      "read_latency_2133": null,
+      "write_latency_1333": null,
+      "write_latency_1600": 2188,
+      "write_latency_1866": null,
+      "write_latency_2133": null
+    }
+  ]
 };
