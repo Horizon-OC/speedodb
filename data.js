@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 353 rows · erista: 63 rows
 // GPU UV submissions — mariko: 17 · erista: 7
-// RAM submissions — mariko: 0 · erista: 0
+// RAM submissions — mariko: 1 · erista: 0
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -4550,6 +4550,42 @@ window.UV_DATA = {
   ]
 };
 window.RAM_DATA = {
-  "mariko": [],
+  "mariko": [
+    {
+      "owner": "Souldbminer",
+      "ram_type": "AM-MGCJ",
+      "notes": "Cursed RAM",
+      "soc_speedo": 1709,
+      "frequency": 2833,
+      "vdd2": 1225,
+      "vddq": 750,
+      "dvb_shift": 2,
+      "soc_max_volt": 1100,
+      "t1": 4,
+      "t2": 2,
+      "t3": 8,
+      "t4": 1,
+      "t5": 4,
+      "t6": 4,
+      "t7": 3,
+      "t8": 6,
+      "tbreak": 0,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": 2000,
+      "read_latency_1600": 2366,
+      "read_latency_1866": 2666,
+      "read_latency_2133": 2833,
+      "write_latency_1333": 2000,
+      "write_latency_1600": 2366,
+      "write_latency_1866": 2666,
+      "write_latency_2133": 2833
+    }
+  ],
   "erista": []
 };
