@@ -2,3 +2,4 @@ platform,owner,soc_speedo,ram_type,frequency,vdd2,vddq,dvb_shift,soc_max_volt,t1
 mariko,Souldbminer,1709,AM-MGCJ,2833,1225,750,2,1100,4,2,8,1,4,4,3,6,0,,,,,,,,2000,2366,2666,2833,2000,2366,2666,2833,Cursed RAM
 mariko,Souldbminer,1682,AA-MGCL,2933,1175,640,2,0,4,4,5,4,5,6,7,6,2133,4,5,4,5,4,3,6,2000,2400,2666,2933,2000,2400,2666,2933,Swapped from WT:F to AA. Still needs a bit of tuning
 erista,Souldbminer,2025,HB-MGCH,2188,1175,,5,,4,5,9,1,2,6,7,6,,,,,,,,,,2188,,,,2188,,,Doesn't benefit from HOC compared to EOS.
+erista,jimmy_f,1975,HB-MGCH,2188,1175,,0,,5,7,9,1,2,5,4,6,,,,,,,,,,,,2188,,,,2188,
