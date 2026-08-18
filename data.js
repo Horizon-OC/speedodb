@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 358 rows · erista: 68 rows
 // GPU UV submissions — mariko: 17 · erista: 8
-// RAM submissions — mariko: 2 · erista: 2
+// RAM submissions — mariko: 3 · erista: 2
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -4734,6 +4734,41 @@ window.RAM_DATA = {
       "write_latency_1600": 2400,
       "write_latency_1866": 2666,
       "write_latency_2133": 2933
+    },
+    {
+      "owner": "jimmy_f",
+      "ram_type": "AA-MGCL",
+      "notes": "",
+      "soc_speedo": 1713,
+      "frequency": 3033,
+      "vdd2": 1175,
+      "vddq": 600,
+      "dvb_shift": 0,
+      "soc_max_volt": 0,
+      "t1": 4,
+      "t2": 4,
+      "t3": 8,
+      "t4": 6,
+      "t5": 7,
+      "t6": 6,
+      "t7": 7,
+      "t8": 6,
+      "tbreak": 2966,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": 5,
+      "low_t7": 6,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": null,
+      "read_latency_1866": null,
+      "read_latency_2133": 3033,
+      "write_latency_1333": null,
+      "write_latency_1600": null,
+      "write_latency_1866": 3033,
+      "write_latency_2133": null
     }
   ],
   "erista": [
