@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 359 rows · erista: 69 rows
 // GPU UV submissions — mariko: 20 · erista: 8
-// RAM submissions — mariko: 4 · erista: 2
+// RAM submissions — mariko: 5 · erista: 2
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -4924,6 +4924,41 @@ window.RAM_DATA = {
       "write_latency_1600": 2133,
       "write_latency_1866": 2766,
       "write_latency_2133": 3000
+    },
+    {
+      "owner": "th3_ne0__",
+      "ram_type": "AM-MGCJ",
+      "notes": "haven't tested higher frequencies.",
+      "soc_speedo": 1635,
+      "frequency": 2666,
+      "vdd2": 1212,
+      "vddq": 650,
+      "dvb_shift": 0,
+      "soc_max_volt": 0,
+      "t1": 5,
+      "t2": 3,
+      "t3": 9,
+      "t4": 6,
+      "t5": 7,
+      "t6": 6,
+      "t7": 4,
+      "t8": 6,
+      "tbreak": 0,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": null,
+      "read_latency_1866": 2666,
+      "read_latency_2133": null,
+      "write_latency_1333": null,
+      "write_latency_1600": 2666,
+      "write_latency_1866": null,
+      "write_latency_2133": null
     }
   ],
   "erista": [
