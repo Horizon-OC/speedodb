@@ -6,3 +6,4 @@ erista,jimmy_f,1975,HB-MGCH,2188,1175,,0,,5,7,9,1,2,5,4,6,,,,,,,,,,,,2188,,,,218
 mariko,jimmy_f,1713,AA-MGCL,3033,1175,600,0,0,4,4,8,6,7,6,7,6,2966,,,,,5,6,,,,,3033,,,3033,,
 mariko,Alvise,1577,AA-MGCL,3000,1175,640,1,0,4,4,8,5,5,6,7,6,,,,,,,,,,2133,2766,3000,,2133,2766,3000,"Haven't tested different rl and wl, haven't teste 1333 at all"
 mariko,th3_ne0__,1635,AM-MGCJ,2666,1212,650,0,0,5,3,9,6,7,6,4,6,0,,,,,,,,,,2666,,,2666,,,haven't tested higher frequencies.
+mariko,Kaani,1648,WT:B,3133,1175,600,2,1075,5,5,6,4,2,6,5,6,0,,,,,,,,,,3133,,,,3133,,"8GB WT:B swap, heavy SOC bottleneck (needs ~1150mV for 3200+)"

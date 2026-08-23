@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 360 rows · erista: 70 rows
 // GPU UV submissions — mariko: 21 · erista: 8
-// RAM submissions — mariko: 5 · erista: 2
+// RAM submissions — mariko: 6 · erista: 2
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -5010,6 +5010,41 @@ window.RAM_DATA = {
       "write_latency_1333": null,
       "write_latency_1600": 2666,
       "write_latency_1866": null,
+      "write_latency_2133": null
+    },
+    {
+      "owner": "Kaani",
+      "ram_type": "WT:B",
+      "notes": "8GB WT:B swap, heavy SOC bottleneck (needs ~1150mV for 3200+)",
+      "soc_speedo": 1648,
+      "frequency": 3133,
+      "vdd2": 1175,
+      "vddq": 600,
+      "dvb_shift": 2,
+      "soc_max_volt": 1075,
+      "t1": 5,
+      "t2": 5,
+      "t3": 6,
+      "t4": 4,
+      "t5": 2,
+      "t6": 6,
+      "t7": 5,
+      "t8": 6,
+      "tbreak": 0,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": null,
+      "read_latency_1866": 3133,
+      "read_latency_2133": null,
+      "write_latency_1333": null,
+      "write_latency_1600": null,
+      "write_latency_1866": 3133,
       "write_latency_2133": null
     }
   ],
