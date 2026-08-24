@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 361 rows · erista: 70 rows
 // GPU UV submissions — mariko: 21 · erista: 8
-// RAM submissions — mariko: 6 · erista: 2
+// RAM submissions — mariko: 7 · erista: 2
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -5054,6 +5054,41 @@ window.RAM_DATA = {
       "write_latency_1333": null,
       "write_latency_1600": null,
       "write_latency_1866": 3133,
+      "write_latency_2133": null
+    },
+    {
+      "owner": "HAZEL",
+      "ram_type": "WT:E",
+      "notes": "+1 on tWTR and tRTW, SoC voltage @ 2800 is 850mV. Appears stable.",
+      "soc_speedo": 1706,
+      "frequency": 2800,
+      "vdd2": 1175,
+      "vddq": 640,
+      "dvb_shift": -2,
+      "soc_max_volt": 1000,
+      "t1": 3,
+      "t2": 4,
+      "t3": 4,
+      "t4": 4,
+      "t5": 5,
+      "t6": 6,
+      "t7": 7,
+      "t8": 6,
+      "tbreak": null,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": 2166,
+      "read_latency_1600": 2733,
+      "read_latency_1866": 2866,
+      "read_latency_2133": null,
+      "write_latency_1333": 2166,
+      "write_latency_1600": 2733,
+      "write_latency_1866": 2866,
       "write_latency_2133": null
     }
   ],
