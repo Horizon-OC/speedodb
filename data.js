@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 370 rows · erista: 71 rows
 // GPU UV submissions — mariko: 22 · erista: 9
-// RAM submissions — mariko: 7 · erista: 2
+// RAM submissions — mariko: 7 · erista: 3
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -5310,6 +5310,41 @@ window.RAM_DATA = {
       "write_latency_1600": null,
       "write_latency_1866": null,
       "write_latency_2133": 2188
+    },
+    {
+      "owner": "Idain",
+      "ram_type": "HB-MGCH",
+      "notes": "It still needs testing to see if it can stand up ST timings, along with fine-tuning latency.",
+      "soc_speedo": 1977,
+      "frequency": 2092,
+      "vdd2": 1237,
+      "vddq": null,
+      "dvb_shift": 2,
+      "soc_max_volt": null,
+      "t1": 4,
+      "t2": 4,
+      "t3": 4,
+      "t4": 0,
+      "t5": 1,
+      "t6": 5,
+      "t7": 4,
+      "t8": 6,
+      "tbreak": null,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": null,
+      "read_latency_1866": null,
+      "read_latency_2133": null,
+      "write_latency_1333": null,
+      "write_latency_1600": null,
+      "write_latency_1866": 2092,
+      "write_latency_2133": null
     }
   ]
 };
