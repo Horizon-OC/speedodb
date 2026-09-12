@@ -448,3 +448,4 @@ mariko,Anxiety_timmy,OLED,1643,1667,1694,NEE,2022/19 SOC date
 mariko,letum00,OLED,1668,1679,1692,WT:F,
 mariko,tpoison,V2,1588,1606,1612,AA-MGCL,"Fortnite Model, AA can do 2966 ST stable 2.5.1 HOC"
 mariko,Tpoison,V2,1629,1638,1655,AA-MGCL,"Another Fortnite Switch, its AA can do 2933 ST stable. It has v13 PMIC out of the box, not an issue according to ctc https://github.com/CTCaer/hekate/issues/1268"
+mariko,阿囧,V2,1750,1756,1771,AM-MGCJ,
