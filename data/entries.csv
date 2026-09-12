@@ -450,3 +450,4 @@ mariko,tpoison,V2,1588,1606,1612,AA-MGCL,"Fortnite Model, AA can do 2966 ST stab
 mariko,Tpoison,V2,1629,1638,1655,AA-MGCL,"Another Fortnite Switch, its AA can do 2933 ST stable. It has v13 PMIC out of the box, not an issue according to ctc https://github.com/CTCaer/hekate/issues/1268"
 mariko,阿囧,V2,1750,1756,1771,AM-MGCJ,
 mariko,阿囧,Lite,1722,1737,1767,AM-MGCJ,
+mariko,unknown,Lite,1592,1600,1620,AA-MGCL,
