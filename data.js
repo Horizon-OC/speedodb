@@ -2,7 +2,7 @@
 // data/uv_entries.csv and data/ram_entries.csv — do not edit by hand.
 // mariko: 478 rows · erista: 77 rows
 // GPU UV submissions — mariko: 22 · erista: 10
-// RAM submissions — mariko: 7 · erista: 4
+// RAM submissions — mariko: 7 · erista: 5
 window.SPEEDO_DATA = {
   "mariko": [
     {
@@ -6429,6 +6429,41 @@ window.RAM_DATA = {
       "write_latency_1333": null,
       "write_latency_1600": null,
       "write_latency_1866": null,
+      "write_latency_2133": null
+    },
+    {
+      "owner": "MiSi",
+      "ram_type": "HB-MGCH",
+      "notes": "SOC 975mv HP MODE ON",
+      "soc_speedo": 1938,
+      "frequency": 2188,
+      "vdd2": 1237,
+      "vddq": null,
+      "dvb_shift": 0,
+      "soc_max_volt": null,
+      "t1": 5,
+      "t2": 7,
+      "t3": 9,
+      "t4": 1,
+      "t5": 1,
+      "t6": 8,
+      "t7": 3,
+      "t8": 4,
+      "tbreak": null,
+      "low_t1": null,
+      "low_t3": null,
+      "low_t4": null,
+      "low_t5": null,
+      "low_t6": null,
+      "low_t7": null,
+      "low_t8": null,
+      "read_latency_1333": null,
+      "read_latency_1600": null,
+      "read_latency_1866": null,
+      "read_latency_2133": 2188,
+      "write_latency_1333": null,
+      "write_latency_1600": null,
+      "write_latency_1866": 2188,
       "write_latency_2133": null
     }
   ]
